@@ -77,7 +77,84 @@ function [possibilities] = getPositions(coords, Board)
         if(coords.x - 1 > 0 && sign(Board(coords.x - 1, coords.y)) == -sign(Board(coords.x, coords.y)) * 9 && Board(coords.x - 1, coords.y + sign(Board(coords.x, coords.y))) == 0)
             possibilities(end + 1) = {coords.x - 1, coords.y + sign(Board(coords.x, coords.y))};
         end
+        return;
     end
+    % if rook
+    if(abs(Board(coords.x, coords.y)) == 5 || abs(Board(coords.x, coords.y)) == 8)
+        x = coords.x - 1;
+        while(x > 0 && Board(x, coords.y) == 0)
+            possibilities(end + 1) = {x - 1, coords.y};
+            x = x - 1;
+        end
+        if(x > 0 && sign(Board(x, coords.y)) == -sign(Board(coords.x, coords.y)))
+            possibilities(end + 1) = {x, coords.y};
+        end
+
+        x = coords.x + 1;
+        while(x < 9 && Board(x, coords.y) == 0)
+            possibilities(end + 1) = {x + 1, coords.y};
+            x = x + 1;
+        end
+        if(x < 9 && sign(Board(x, coords.y)) == -sign(Board(coords.x, coords.y)))
+            possibilities(end + 1) = {x, coords.y};
+        end
+
+        y = coords.y - 1;
+        while(y > 0 && Board(coords.x, y) == 0)
+            possibilities(end + 1) = {coords.x, y - 1};
+            y = y - 1;
+        end
+        if(y > 0 && sign(Board(coords.x, y)) == -sign(Board(coords.x, coords.y)))
+            possibilities(end + 1) = {coords.x, y};
+        end
+
+        y = coords.y + 1;
+        while(y < 9 && Board(coords.x, y) == 0)
+            possibilities(end + 1) = {coords.x, y + 1};
+            y = y + 1;
+        end
+        if(y < 9 && sign(Board(coords.x, y)) == -sign(Board(coords.x, coords.y)))
+            possibilities(end + 1) = {coords.x, y};
+        end
+        return;
+    end
+    % if knight
+    if(abs(Board(coords.x, coords.y)) == 4)
+        if(coords.x + 1 < 9)
+            if(coords.y - 2 > 0 && (Board(coords.x + 1, coords.y - 2) == 0 || sign(Board(coords.x + 1, coords.y - 2)) == -sign(Board(coords.x, coords.y))))
+                possibilities(end + 1) = {coords.x + 1, coords.y - 2};
+            end
+            if(coords.y + 2 < 9 && (Board(coords.x + 1, coords.y + 2) == 0 || sign(Board(coords.x + 1, coords.y + 2)) == -sign(Board(coords.x, coords.y))))
+                possibilities(end + 1) = {coords.x + 1, coords.y + 2};
+            end
+        end
+        if(coords.x - 1 > 0)
+            if(coords.y - 2 > 0 && (Board(coords.x - 1, coords.y - 2) == 0 || sign(Board(coords.x - 1, coords.y - 2)) == -sign(Board(coords.x, coords.y))))
+                possibilities(end + 1) = {coords.x - 1, coords.y - 2};
+            end
+            if(coords.y + 2 < 9 && (Board(coords.x - 1, coords.y + 2) == 0 || sign(Board(coords.x - 1, coords.y + 2)) == -sign(Board(coords.x, coords.y))))
+                possibilities(end + 1) = {coords.x - 1, coords.y + 2};
+            end
+        end
+        if(coords.y + 1 < 9)
+            if(coords.x - 2 > 0 && (Board(coords.x - 2, coords.y + 1) == 0 || sign(Board(coords.x - 2, coords.y + 1)) == -sign(Board(coords.x, coords.y))))
+                possibilities(end + 1) = {coords.x - 2, coords.y + 1};
+            end
+            if(coords.x + 2 < 9 && (Board(coords.x + 2, coords.y + 1) == 0 || sign(Board(coords.x + 2, coords.y + 1)) == -sign(Board(coords.x, coords.y))))
+                possibilities(end + 1) = {coords.x + 2, coords.y + 1};
+            end
+        end
+        if(coords.y - 1 > 0)
+            if(coords.x - 2 > 0 && (Board(coords.x - 2, coords.y - 1) == 0 || sign(Board(coords.x - 2, coords.y - 1)) == -sign(Board(coords.x, coords.y))))
+                possibilities(end + 1) = {coords.x - 2, coords.y - 1};
+            end
+            if(coords.x + 2 < 9 && (Board(coords.x + 2, coords.y - 1) == 0 || sign(Board(coords.x + 2, coords.y - 1)) == -sign(Board(coords.x, coords.y))))
+                possibilities(end + 1) = {coords.x + 2, coords.y - 1};
+            end
+        end
+        return;
+    end
+
 
 end
 
