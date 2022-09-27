@@ -1,6 +1,6 @@
 Board = createBoard();
 displayBoard(Board);
-pos = getPositions(5, 2, Board);
+pos = getPositions(5, 1, Board);
 for i = 1:size(pos, 1)
     drawPoint(pos(i, 1), pos(i, 2), 45);
 end

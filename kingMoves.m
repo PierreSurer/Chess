@@ -5,10 +5,10 @@ function [possibilities] = kingMoves(x, y, Board)
         if(Board(x + 1, y) == 0 || sign(Board(x + 1, y)) ~= sign(Board(x, y)))
             possibilities(end + 1, :) = [x + 1, y];
         end
-        if(y + 1 < 9 && Board(x + 1, y + 1) == 0 || sign(Board(x + 1, y + 1)) ~= sign(Board(x, y)))
+        if(y + 1 < 9 && (Board(x + 1, y + 1) == 0 || sign(Board(x + 1, y + 1)) ~= sign(Board(x, y))))
             possibilities(end + 1, :) = [x + 1, y + 1];
         end
-        if(y - 1 > 0 && Board(x + 1, y - 1) == 0 || sign(Board(x + 1, y - 1)) ~= sign(Board(x, y)))
+        if(y - 1 > 0 && (Board(x + 1, y - 1) == 0 || sign(Board(x + 1, y - 1)) ~= sign(Board(x, y))))
             possibilities(end + 1, :) = [x + 1, y - 1];
         end
     end
@@ -16,17 +16,17 @@ function [possibilities] = kingMoves(x, y, Board)
         if(Board(x - 1, y) == 0 || sign(Board(x - 1, y)) ~= sign(Board(x, y)))
             possibilities(end + 1, :) = [x - 1, y];
         end
-        if(y + 1 < 9 && Board(x - 1, y + 1) == 0 || sign(Board(x - 1, y + 1)) ~= sign(Board(x, y)))
+        if(y + 1 < 9 && (Board(x - 1, y + 1) == 0 || sign(Board(x - 1, y + 1)) ~= sign(Board(x, y))))
             possibilities(end + 1, :) = [x - 1, y + 1];
         end
-        if(y - 1 > 0 && Board(x - 1, y - 1) == 0 || sign(Board(x - 1, y - 1)) ~= sign(Board(x, y)))
+        if(y - 1 > 0 && (Board(x - 1, y - 1) == 0 || sign(Board(x - 1, y - 1)) ~= sign(Board(x, y))))
             possibilities(end + 1, :) = [x - 1, y - 1];
         end
     end
-    if(y + 1 < 9 && Board(x, y + 1) == 0 || sign(Board(x, y + 1)) ~= sign(Board(x, y)))
+    if(y + 1 < 9 && (Board(x, y + 1) == 0 || sign(Board(x, y + 1)) ~= sign(Board(x, y))))
         possibilities(end + 1, :) = [x, y + 1];
     end
-    if(y - 1 > 0 && Board(x, y - 1) == 0 || sign(Board(x, y - 1)) ~= sign(Board(x, y)))
+    if(y - 1 > 0 && (Board(x, y - 1) == 0 || sign(Board(x, y - 1)) ~= sign(Board(x, y))))
         possibilities(end + 1, :) = [x, y - 1];
     end
     % castle
