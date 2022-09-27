@@ -6,10 +6,14 @@ function [] = createBoard(Board)
     % 4 : knight
     % 5 : rook
     % 6 : pawn
+    % 7 : moved_king
+    % 8 : moved_rook
+    % 9 : pawn_en_passant
+    
     
     for i = 1:8
-        Board(i,2) = 6
-        Board(i,7) = -6
+        Board(i,2) = 6;
+        Board(i,7) = -6;
     end
     
     Board(1,1) = 5;
@@ -32,3 +36,45 @@ function [] = createBoard(Board)
     Board(4,8) = -2;
     Board(5,8) = -1;
 end
+
+function [possibilities] = getPositions(coords, Board)
+    possibilities = [];
+    if(Board(coords.x, coords.y) == 0)
+       return;
+    end
+    % if pawn
+    if(abs(Board(coords.x, coords.y)) == 6 || abs(Board(coords.x, coords.y)) == 9) 
+        % normal forward move
+        if(Board(coords.x, coords.y + sign(Board(coords.x, coords.y))) == 0) 
+            possibilities(end + 1) = {coords.x, coords.y + sign(Board(coords.x, coords.y))};
+        end
+        % double forward move (white)
+        if(coords.y == 2 && sign(Board(coords.x, 2)) == 1) 
+            if(Board(coords.x, 3) == 0 && Board(coords.x, 4) == 0)
+                possibilities(end + 1) = {coords.x, 4};
+            end
+        end
+        % double forward move (black)
+        if(coords.y == 7 && sign(Board(coords.x, 2)) == -1) 
+            if(Board(coords.x, 6) == 0 && Board(coords.x, 5) == 0)
+                possibilities(end + 1) = {coords.x, 5};
+            end
+        end
+        % diagonal attack moves
+        if(coords.x + 1 < 9 && sign(Board(coords.x + 1, coords.y + sign(Board(coords.x, coords.y)))) ~= sign(Board(coords.x, coords.y)))
+            possibilities(end + 1) = {coords.x + 1, coords.y + sign(Board(coords.x, coords.y))};
+        end
+        if(coords.x - 1 > 0 && sign(Board(coords.x - 1, coords.y + sign(Board(coords.x, coords.y)))) ~= sign(Board(coords.x, coords.y)))
+            possibilities(end + 1) = {coords.x - 1, coords.y + sign(Board(coords.x, coords.y))};
+        end
+        % en passant
+        if(coords.x + 1 < 9 && sign(Board(coords.x + 1, coords.y)) == -sign(Board(coords.x, coords.y)) * 9 && Board(coords.x + 1, coords.y + sign(Board(coords.x, coords.y))) == 0)
+            possibilities(end + 1) = {coords.x + 1, coords.y + sign(Board(coords.x, coords.y))};
+        end
+        if(coords.x - 1 > 0 && sign(Board(coords.x - 1, coords.y)) == -sign(Board(coords.x, coords.y)) * 9 && Board(coords.x - 1, coords.y + sign(Board(coords.x, coords.y))) == 0)
+            possibilities(end + 1) = {coords.x - 1, coords.y + sign(Board(coords.x, coords.y))};
+        end
+    end
+
+end
+
