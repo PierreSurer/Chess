@@ -1,5 +1,6 @@
 Board = createBoard();
 displayBoard(Board);
+isKingChessed(5, 1, Board)
 
 function [Board] = createBoard()
     Board = zeros(8,8);
@@ -40,41 +41,36 @@ function [Board] = createBoard()
     Board(5,8) = -1;
 end
 
-function [possibilities] = getPositions(coords, Board) 
-    if(Board(coords.x, coords.y) == 0)
+function [possibilities] = getPositions(x, y, Board) 
+    current = Board(x, y);
+    if(current == 0)
        possibilities = [];
-       return;
-    end
+    
     % if pawn
-    if(abs(Board(coords.x, coords.y)) == 6 || abs(Board(coords.x, coords.y)) == 9) 
-        possibilities = pawnMoves(coords, Board);
-        return;
-    end
+    elseif(abs(current) == 6 || abs(current) == 9) 
+        possibilities = pawnMoves(x, y, Board);
+    
     % if rook
-    if(abs(Board(coords.x, coords.y)) == 5 || abs(Board(coords.x, coords.y)) == 8)
-       possibilities = rookMoves(coords, Board);
-       return;
-    end
+    elseif(abs(current) == 5 || abs(current) == 8)
+       possibilities = rookMoves(x, y, Board);
+
     % if knight
-    if(abs(Board(coords.x, coords.y)) == 4)
-        possibilities = knightMoves(coords, Board);
-        return;
-    end
+    elseif(abs(current) == 4)
+        possibilities = knightMoves(x, y, Board);
+
     % if bishop
-    if(abs(Board(coords.x, coords.y)) == 3)
-        possibilities = bishopMoves(coords, Board);
-        return;
-    end
+    elseif(abs(current) == 3)
+        possibilities = bishopMoves(x, y, Board);
+
     % if queen
-    if(abs(Board(coords.x, coords.y)) == 2)
-        possibilities = bishopMoves(coords, Board);
-        possibilities = cat(1, possibilities, rookMoves(coords, Board));
-        return;
-    end
+    elseif(abs(current) == 2)
+        possibilities = bishopMoves(x, y, Board);
+        possibilities = cat(1, possibilities, rookMoves(x, y, Board));
+
     % if king
-    if(abs(Board(coords.x, coords.y)) == 1 || abs(Board(coords.x, coords.y)) == 7)
-        possibilities = kingMoves(coords, Board);
-        return;
+    elseif(abs(current) == 1 || abs(current) == 7)
+        possibilities = kingMoves(x, y, Board);
+
     end
 end
 
