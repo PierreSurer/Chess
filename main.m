@@ -1,6 +1,9 @@
 Board = createBoard();
 displayBoard(Board);
-isKingChessed(5, 1, Board)
+pos = getPositions(5, 2, Board);
+for i = 1:size(pos, 1)
+    drawPoint(pos(i, 1), pos(i, 2), 45);
+end
 
 function [Board] = createBoard()
     Board = zeros(8,8);
@@ -113,5 +116,15 @@ function [] = displayBoard(Board)
     hold on
     h = imshow(imgs);
     set(h, 'AlphaData', alphas);
+    hold off
+end
+
+% draw a circle in tile (x, y).
+function [] = drawPoint(x, y, tileWidth)
+    hold on
+    theta = 0:pi/50:2*pi;
+    x = (x - 0.5 + cos(theta) * 0.15) * tileWidth;
+    y = (y - 0.5 + sin(theta) * 0.15) * tileWidth;
+    h = fill(y, x, 'green', 'EdgeColor', 'none', 'FaceAlpha', 0.5);
     hold off
 end
