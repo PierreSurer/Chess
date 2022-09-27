@@ -79,17 +79,18 @@ function [result] = isKingChessed(x, y, Board)
         return;
     end
     
+    
     if(y + sign(Board(x, y)) < 9 && y + sign(Board(x, y)) > 0)
         if(x + 1 < 9 && (Board(x + 1, y + sign(Board(x, y))) == -sign(Board(x, y)) * 6 || Board(x + 1, y + sign(Board(x, y))) == -sign(Board(x, y)) * 9))
             result = 1;
             return;
         end
-        if(x - 1 > 0 && (Board(x - 1, y + sign(Board(x, y))) == 6 || Board(x - 1, y + sign(Board(x, y))) == 9))
+        if(x - 1 > 0 && (Board(x - 1, y + sign(Board(x, y))) == -sign(Board(x, y)) * 6 || Board(x - 1, y + sign(Board(x, y))) == -sign(Board(x, y)) * 9))
             result = 1;
             return;
         end
     end
-    
+
     knightpos = knightMoves(x, y, Board);
     if(any(Board(knightpos) == -sign(Board(x, y)) * 4))
         result = 1;

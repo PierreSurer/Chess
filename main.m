@@ -1,10 +1,24 @@
 Board = createBoard();
 displayBoard(Board);
-pos = getPositions(5, 1, Board);
-for i = 1:size(pos, 1)
-    drawPoint(pos(i, 1), pos(i, 2), 45);
-end
 
+pos = [];
+success = false;
+while(not(success))
+    lastX = x;
+    lastY = y;
+    [x, y] = userInput();
+    if(not(isempty(pos)) && any(ismember(pos, [x, y], 'rows')))
+        [success, Board] = computeMove(lastX, lastY, x, y, Board);
+    else
+        pos = getPositions(x, y, Board);
+    end
+    displayBoard(Board);
+    for i = 1:size(pos, 1)
+        drawPoint(pos(i, 1), pos(i, 2), 45);
+    end
+
+end
+displayBoard(Board);
 function [Board] = createBoard()
     Board = zeros(8,8);
     % 1 : king
@@ -128,3 +142,13 @@ function [] = drawPoint(x, y, tileWidth)
     h = fill(y, x, 'green', 'EdgeColor', 'none', 'FaceAlpha', 0.5);
     hold off
 end
+
+function [x, y] = userInput()
+    [pixX,pixY,~] = ginput(1);
+    x = floor(pixY / 45) + 1;
+    y = floor(pixX / 45) + 1;
+    x = min(max(x, 1), 8);
+    y = min(max(y, 1), 8);
+
+end
+  

@@ -1,4 +1,4 @@
-function [success, Board] = computeMove(Board, startX, startY, endX, endY)
+function [success, Board] = computeMove(startX, startY, endX, endY, Board)
     PostBoard = Board;
     PostBoard(endX, endY) = Board(startX, startY);
     PostBoard(startX, startY) = 0;
@@ -37,7 +37,7 @@ function [success, Board] = computeMove(Board, startX, startY, endX, endY)
         PostBoard(1, startY) = 0;
         PostBoard(endX, endY) = PostBoard(endX, endY) * 7;
     end
-    
+    [startX, startY]
     [x, y] = searchKing(sign(Board(startX, startY)), PostBoard);
     if(isKingChessed(x, y, PostBoard))
         success = false;
@@ -48,5 +48,5 @@ function [success, Board] = computeMove(Board, startX, startY, endX, endY)
 end
 
 function [x, y] = searchKing(team, Board)
-    [x,y] = find(Board == team || Board == team * 7);
+    [x,y] = find(Board == team * 1 | Board == team * 7);
 end
