@@ -1,4 +1,7 @@
-function [] = createBoard(Board)
+Board = createBoard();
+displayBoard(Board);
+
+function [Board] = createBoard()
     Board = zeros(8,8);
     % 1 : king
     % 2 : queen
@@ -78,3 +81,30 @@ function [possibilities] = getPositions(coords, Board)
 
 end
 
+function im = getPieceImage(im, index)
+    [h, w] = size(im);
+    w = w / 6;
+    h = h / 2;
+
+    if index == 0
+        im = zeros(w, h);
+        return;
+    end
+
+    lookup = containers.Map({
+        1, 2, 3, 4, 5, 6, 7, 8, 9
+    }, {
+        0, 1, 2, 3, 4, 5, 6, 7, 8
+    });
+
+    x = w * lookup(abs(index));
+    y = h * (index < 0);
+
+    im = im(1+y:y+h, 1+x:x+w);
+end
+
+function [] = displayBoard(Board)
+    im = imread('pieces.png');
+    imgs = arrayfun(@(x) getPieceImage(im, x), Board, 'UniformOutput', false);
+    montage(imgs);
+end
