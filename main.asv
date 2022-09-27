@@ -1,0 +1,8 @@
+board = zeros(8,8);
+% 1 : king
+% 2 : queen
+% 3 : bishop
+% 4 : knight
+% 5 : rook
+% 6 : pawn
+
