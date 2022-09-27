@@ -84,7 +84,7 @@ function im = getPieceImage(im, index)
     h = h / 2;
 
     if index == 0
-        im = zeros(w, h);
+        im = zeros(w, h, 'uint8');
         return;
     end
 
@@ -101,7 +101,21 @@ function im = getPieceImage(im, index)
 end
 
 function [] = displayBoard(Board)
-    im = imread('pieces.png');
+    [im, ~, alpha] = imread('pieces.png');
     imgs = arrayfun(@(x) getPieceImage(im, x), Board, 'UniformOutput', false);
-    montage(imgs);
+    alphas = arrayfun(@(x) getPieceImage(alpha, x), Board, 'UniformOutput', false);
+    imgs = cell2mat(imgs);
+    alphas = cell2mat(alphas);
+    
+    tile = [181 136 99; 240 217 181; 240 217 181; 181 136 99] / 255;
+    tile = reshape(tile, [2, 2, 3]);
+    s = size(imgs);
+    checker = repmat(tile, 4);
+    checker = imresize(checker, s(1) / 8, 'nearest');
+
+    imshow(checker);
+    hold on
+    h = imshow(imgs);
+    set(h, 'AlphaData', alphas);
+    hold off
 end
