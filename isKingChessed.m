@@ -62,7 +62,7 @@ function [result] = isKingChessed(x, y, Board)
     end
 
     tmpY = y + 1;
-    while(tmpY < 8 && Board(y, tmpX) == 0)
+    while(tmpY < 8 && Board(x, tmpY) == 0)
         tmpY = tmpY + 1;
     end
     if(tmpY < 9 && (Board(x, tmpY) == -sign(Board(x, y)) * 2 || Board(x, tmpY) == -sign(Board(x, y)) * 5 || Board(x, tmpY) == -sign(Board(x, y)) * 8))
@@ -71,7 +71,7 @@ function [result] = isKingChessed(x, y, Board)
     end
 
     tmpY = y - 1;
-    while(tmpY > 1 && Board(y, tmpX) == 0)
+    while(tmpY > 1 && Board(x, tmpY) == 0)
         tmpY = tmpY - 1;
     end
     if(tmpY > 0 && (Board(x, tmpY) == -sign(Board(x, y)) * 2 || Board(x, tmpY) == -sign(Board(x, y)) * 5 || Board(x, tmpY) == -sign(Board(x, y)) * 8))
@@ -91,8 +91,8 @@ function [result] = isKingChessed(x, y, Board)
         end
     end
 
-    knightpos = knightMoves(x, y, Board);
-    if(any(Board(knightpos) == -sign(Board(x, y)) * 4))
+    knightpos = knightMoves(x, y, Board);   
+    if(any(Board(sub2ind(size(Board), knightpos(:,1), knightpos(:,2))) == -sign(Board(x, y)) * 4))
         result = 1;
         return;
     end

@@ -1,24 +1,41 @@
 Board = createBoard();
 displayBoard(Board);
+lastX;
+lastY;
+x;
+y;
+while(true)
+    pos = [];
+    success = false;
 
-pos = [];
-success = false;
-while(not(success))
-    lastX = x;
-    lastY = y;
-    [x, y] = userInput();
-    if(not(isempty(pos)) && any(ismember(pos, [x, y], 'rows')))
-        [success, Board] = computeMove(lastX, lastY, x, y, Board);
-    else
-        pos = getPositions(x, y, Board);
+    while(not(success))
+        [x, y] = userInput();
+        if(not(isempty(pos)) && any(ismember(pos, [x, y], 'rows')))
+            [success, Board] = computeMove(lastX, lastY, x, y, Board);
+        else
+            pos = getPositions(x, y, Board);
+            finalPos = [];
+            for i = 1:size(pos)
+                if(computeMove(x, y, pos(i, 1), pos(i, 2), Board))
+                    finalPos(end + 1, :) =  [pos(i, 1), pos(i, 2)];
+                end
+            end
+            pos = finalPos;
+            lastX = x;
+            lastY = y;
+        end
+        displayBoard(Board);
+        for i = 1:size(pos, 1)
+            if(Board(pos(i, 1), pos(i, 2)) == 0)
+                drawPoint(pos(i, 1), pos(i, 2), 45);
+            else
+                drawTarget(pos(i, 1), pos(i, 2), 45);
+            end
+        end
+    
     end
     displayBoard(Board);
-    for i = 1:size(pos, 1)
-        drawPoint(pos(i, 1), pos(i, 2), 45);
-    end
-
 end
-displayBoard(Board);
 function [Board] = createBoard()
     Board = zeros(8,8);
     % 1 : king
@@ -45,7 +62,7 @@ function [Board] = createBoard()
     Board(2,1) = 4;
     Board(7,1) = 4;
     Board(2,8) = -4;
-    Board(7,8) = -4;
+    Board(7,6) = -4;
     
     Board(3,1) = 3;
     Board(6,1) = 3;
@@ -53,7 +70,7 @@ function [Board] = createBoard()
     Board(6,8) = -3;
     
     Board(4,1) = 2;
-    Board(5,1) = 1;
+    Board(5,5) = 1;
     Board(4,8) = -2;
     Board(5,8) = -1;
 end
@@ -104,7 +121,7 @@ function im = getPieceImage(im, index)
     lookup = containers.Map({
         1, 2, 3, 4, 5, 6, 7, 8, 9
     }, {
-        0, 1, 2, 3, 4, 5, 6, 7, 8
+        0, 1, 2, 3, 4, 5, 0, 4, 5
     });
 
     x = w * lookup(abs(index));
@@ -143,8 +160,23 @@ function [] = drawPoint(x, y, tileWidth)
     hold off
 end
 
+% draw a target in tile (x, y).
+function [] = drawTarget(x, y, tileWidth)
+    hold on
+    theta = 0:pi/50:2*pi;
+    xVals = [x * tileWidth, x * tileWidth, (x - 1) * tileWidth, (x - 1) * tileWidth, x * tileWidth, x * tileWidth];
+    yVals = [(y - 0.5) * tileWidth, (y - 1) * tileWidth, (y - 1) * tileWidth, y * tileWidth, y * tileWidth, (y - 0.5) * tileWidth];
+    xVals = [xVals, (x - 0.5 + cos(theta) * 0.45) * tileWidth];
+    yVals = [yVals, (y - 0.5 + sin(theta) * 0.45) * tileWidth];
+    h = fill(yVals, xVals, 'green', 'EdgeColor', 'none', 'FaceAlpha', 0.5);
+    hold off
+end
+
 function [x, y] = userInput()
-    [pixX,pixY,~] = ginput(1);
+    type = 0;
+    while(type ~= 1)
+        [pixX,pixY,type] = ginput(1);
+    end
     x = floor(pixY / 45) + 1;
     y = floor(pixX / 45) + 1;
     x = min(max(x, 1), 8);

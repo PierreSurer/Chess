@@ -26,18 +26,15 @@ function [success, Board] = computeMove(startX, startY, endX, endY, Board)
         PostBoard(endX, endY - sign(PostBoard(endX, endY))) = 0;
     end
     % small castle
-    if(endX == 7 && Board(startX, startY) == 1)
+    if(endX == 7 && abs(Board(startX, startY)) == 1)
         PostBoard(6, startY) = sign(Board(startX, startY)) * 8;
         PostBoard(8, startY) = 0;
-        PostBoard(endX, endY) = PostBoard(endX, endY) * 7;
     end
     % big castle
-    if(endX == 3 && Board(startX, startY) == 1)
+    if(endX == 3 && abs(Board(startX, startY)) == 1)
         PostBoard(4, startY) = sign(Board(startX, startY)) * 8;
         PostBoard(1, startY) = 0;
-        PostBoard(endX, endY) = PostBoard(endX, endY) * 7;
     end
-    [startX, startY]
     [x, y] = searchKing(sign(Board(startX, startY)), PostBoard);
     if(isKingChessed(x, y, PostBoard))
         success = false;
