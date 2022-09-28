@@ -91,10 +91,12 @@ function [result] = isKingChessed(x, y, Board)
         end
     end
 
-    knightpos = knightMoves(x, y, Board);   
-    if(any(Board(sub2ind(size(Board), knightpos(:,1), knightpos(:,2))) == -sign(Board(x, y)) * 4))
-        result = 1;
-        return;
+    knightpos = knightMoves(x, y, Board);
+    if(size(knightpos) > 0)
+        if(any(Board(sub2ind(size(Board), knightpos(:,1), knightpos(:,2))) == -sign(Board(x, y)) * 4))
+            result = 1;
+            return;
+        end
     end
 
     result = 0;

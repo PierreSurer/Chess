@@ -1,30 +1,29 @@
 Board = createBoard();
 displayBoard(Board);
-lastX;
-lastY;
-x;
-y;
+lastX = 0;
+lastY = 0;
+x = 4;
+y = 4;
+team = 1;
 while(true)
     pos = [];
     success = false;
-
     while(not(success))
         [x, y] = userInput();
         if(not(isempty(pos)) && any(ismember(pos, [x, y], 'rows')))
             [success, Board] = computeMove(lastX, lastY, x, y, Board);
         else
             pos = getPositions(x, y, Board);
-            finalPos = [];
-            for i = 1:size(pos)
-                if(computeMove(x, y, pos(i, 1), pos(i, 2), Board))
-                    finalPos(end + 1, :) =  [pos(i, 1), pos(i, 2)];
-                end
+            if(sign(Board(x, y)) ~= team)
+                pos = [];
             end
-            pos = finalPos;
             lastX = x;
             lastY = y;
         end
         displayBoard(Board);
+        if(size(pos) > 0)
+            selectPawn(x, y, 45);
+        end
         for i = 1:size(pos, 1)
             if(Board(pos(i, 1), pos(i, 2)) == 0)
                 drawPoint(pos(i, 1), pos(i, 2), 45);
@@ -35,7 +34,23 @@ while(true)
     
     end
     displayBoard(Board);
+    win = isWin(team, Board);
+    if(win == 1)
+        if(team == 1)
+            fprintf('white wins !\n');
+        else
+            fprintf('black wins !\n');
+        end
+        break;
+    elseif(win == -1)
+        fprintf('pat\n');
+        break;
+    else
+        team = -team;
+    end
+    
 end
+
 function [Board] = createBoard()
     Board = zeros(8,8);
     % 1 : king
@@ -62,7 +77,7 @@ function [Board] = createBoard()
     Board(2,1) = 4;
     Board(7,1) = 4;
     Board(2,8) = -4;
-    Board(7,6) = -4;
+    Board(7,8) = -4;
     
     Board(3,1) = 3;
     Board(6,1) = 3;
@@ -70,42 +85,9 @@ function [Board] = createBoard()
     Board(6,8) = -3;
     
     Board(4,1) = 2;
-    Board(5,5) = 1;
+    Board(5,1) = 1;
     Board(4,8) = -2;
     Board(5,8) = -1;
-end
-
-function [possibilities] = getPositions(x, y, Board) 
-    current = Board(x, y);
-    if(current == 0)
-       possibilities = [];
-    
-    % if pawn
-    elseif(abs(current) == 6 || abs(current) == 9) 
-        possibilities = pawnMoves(x, y, Board);
-    
-    % if rook
-    elseif(abs(current) == 5 || abs(current) == 8)
-       possibilities = rookMoves(x, y, Board);
-
-    % if knight
-    elseif(abs(current) == 4)
-        possibilities = knightMoves(x, y, Board);
-
-    % if bishop
-    elseif(abs(current) == 3)
-        possibilities = bishopMoves(x, y, Board);
-
-    % if queen
-    elseif(abs(current) == 2)
-        possibilities = bishopMoves(x, y, Board);
-        possibilities = cat(1, possibilities, rookMoves(x, y, Board));
-
-    % if king
-    elseif(abs(current) == 1 || abs(current) == 7)
-        possibilities = kingMoves(x, y, Board);
-
-    end
 end
 
 function im = getPieceImage(im, index)
@@ -172,11 +154,18 @@ function [] = drawTarget(x, y, tileWidth)
     hold off
 end
 
+% draw a selection in tile (x, y).
+function [] = selectPawn(x, y, tileWidth)
+    hold on
+    theta = 0:pi/50:2*pi;
+    xVals = [x * tileWidth, (x - 1) * tileWidth, (x - 1) * tileWidth, x * tileWidth];
+    yVals = [(y - 1) * tileWidth, (y - 1) * tileWidth, y * tileWidth, y * tileWidth];
+    h = fill(yVals, xVals, 'green', 'EdgeColor', 'none', 'FaceAlpha', 0.5);
+    hold off
+end
+
 function [x, y] = userInput()
-    type = 0;
-    while(type ~= 1)
-        [pixX,pixY,type] = ginput(1);
-    end
+    [pixX,pixY,~] = ginput(1);
     x = floor(pixY / 45) + 1;
     y = floor(pixX / 45) + 1;
     x = min(max(x, 1), 8);
