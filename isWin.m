@@ -1,6 +1,6 @@
 % 0 not win, 1 win, -1 pat
 function[win] = isWin(team, Board)
-    [x, y] = find(sign(Board) == -team); 
+    [x, y] = find(sign(Board) == -team);
     possibleMoves = cell2mat(arrayfun(@(a, b) size(getPositions(a,  b, Board), 1), x, y,'uniformoutput',false));
     if(any(possibleMoves))
         win = 0;

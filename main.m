@@ -9,7 +9,16 @@ while(true)
     pos = [];
     success = false;
     while(not(success))
-        [x, y] = userInput();
+        if(team == 1)
+            [x, y] = userInput();
+        else
+            [a, b, c, d, val] = computeIA(4, team, Board);
+            lastX = a;
+            lastY = b;
+            x = c;
+            y = d;
+            pos = [[c, d]];
+        end
         if(not(isempty(pos)) && any(ismember(pos, [x, y], 'rows')))
             [success, Board] = computeMove(lastX, lastY, x, y, Board);
         else
