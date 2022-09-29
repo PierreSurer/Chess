@@ -1,4 +1,4 @@
-function [startX, startY, endX, endY, val] = computeIA(depth, team, Board)
+function [startX, startY, endX, endY, val] = computeIA(depth, team, alpha, beta, Board)
     win = isWin(-team, Board);
     if(win == 1)
         val = -1000000;
@@ -14,7 +14,7 @@ function [startX, startY, endX, endY, val] = computeIA(depth, team, Board)
         val = 0;
     else
 
-        if(depth == 1)
+        if(depth == 0)
             startX = 1;
             startY = 1;
             endX = 1;
@@ -29,19 +29,32 @@ function [startX, startY, endX, endY, val] = computeIA(depth, team, Board)
                     possibleMoves(end + 1, :) = [x(i, 1), y(i, 1), pos(j, 1), pos(j, 2)];
                 end
             end
-            val = -100000000000000;
+            taken = abs(Board(sub2ind(size(Board), possibleMoves(:, 4),possibleMoves(:, 4))));
+            taken = arrayfun(@(a) getVal(a + 1), taken);
+            [~, idx] = sort(taken);
+            val = -1000000000;
             for move = 1:size(possibleMoves)
-                [~, nextBoard] = computeMove(possibleMoves(move, 1), possibleMoves(move, 2), possibleMoves(move, 3), possibleMoves(move, 4), Board);
-                [~, ~, ~, ~, tmpVal] = computeIA(depth - 1, -team, nextBoard); % TODO : reuse moves
+                [~, nextBoard] = computeMove(possibleMoves(idx(move), 1), possibleMoves(idx(move), 2), possibleMoves(idx(move), 3), possibleMoves(idx(move), 4), Board);
+                [~, ~, ~, ~, tmpVal] = computeIA(depth - 1, -team, -beta, -alpha, nextBoard); % TODO : reuse moves
                 if(-tmpVal > val)
-                    startX = possibleMoves(move, 1);
-                    startY = possibleMoves(move, 2);
-                    endX = possibleMoves(move, 3);
-                    endY = possibleMoves(move, 4);
+                    startX = possibleMoves(idx(move), 1);
+                    startY = possibleMoves(idx(move), 2);
+                    endX = possibleMoves(idx(move), 3);
+                    endY = possibleMoves(idx(move), 4);
                     val = -tmpVal;
+                end
+                alpha = max(alpha, val);
+                if(alpha >= beta)
+                    return;
                 end
             end
 
         end
     end
+end
+
+function [val] = getVal(val)
+    values = [0, 100, 16, 7, 6, 10, 1, 100, 10, 1];
+    val = values(val);
+
 end

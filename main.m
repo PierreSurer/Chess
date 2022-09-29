@@ -9,10 +9,12 @@ while(true)
     pos = [];
     success = false;
     while(not(success))
-        if(team == 1)
+        if(team == 0)
             [x, y] = userInput();
         else
-            [a, b, c, d, val] = computeIA(4, team, Board);
+            tic;
+            [a, b, c, d, val] = computeIA(5, team, -1000000000, 1000000000, Board);
+            toc;
             lastX = a;
             lastY = b;
             x = c;
@@ -43,6 +45,7 @@ while(true)
     
     end
     displayBoard(Board);
+    shg
     win = isWin(team, Board);
     if(win == 1)
         if(team == 1)
@@ -71,8 +74,7 @@ function [Board] = createBoard()
     % 7 : moved_king
     % 8 : moved_rook
     % 9 : pawn_en_passant
-    
-    
+
     for i = 1:8
         Board(i,2) = 6;
         Board(i,7) = -6;
@@ -97,6 +99,7 @@ function [Board] = createBoard()
     Board(5,1) = 1;
     Board(4,8) = -2;
     Board(5,8) = -1;
+
 end
 
 function im = getPieceImage(im, index)
