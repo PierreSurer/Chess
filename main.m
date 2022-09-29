@@ -1,5 +1,7 @@
 Board = createBoard();
+openGame(Board)
 displayBoard(Board);
+shg
 lastX = 0;
 lastY = 0;
 x = 4;
