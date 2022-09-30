@@ -14,6 +14,11 @@ while(true)
         if(team == 0)
             [x, y] = userInput();
         else
+            if(team == 1)
+                fprintf('White - ');
+            else
+                fprintf('Black - ');
+            end
             tic;
             [a, b, c, d, val] = computeIA(5, team, -1000000000, 1000000000, Board);
             toc;

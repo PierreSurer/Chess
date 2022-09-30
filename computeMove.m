@@ -1,7 +1,7 @@
 function [success, Board] = computeMove(startX, startY, endX, endY, Board)
-    PostBoard = Board;
     team = sign(Board(startX, startY));
     Board(Board == team * 9) = team * 6;
+    PostBoard = Board;
     PostBoard(endX, endY) = Board(startX, startY);
     PostBoard(startX, startY) = 0;
     
