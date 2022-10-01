@@ -20,7 +20,7 @@ while(true)
                 fprintf('Black - ');
             end
             tic;
-            [a, b, c, d, val] = computeIA(5, team, -1000000000, 1000000000, Board);
+            [a, b, c, d, val] = computeIA(4, team, -1000000000, 1000000000, Board);
             toc;
             lastX = a;
             lastY = b;
