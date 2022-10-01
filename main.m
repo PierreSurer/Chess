@@ -1,9 +1,9 @@
 Board = createBoard();
-openGame(Board)
 displayBoard(Board);
+previousMoves = cell(0);
 
 team = 1; % team: 1=white, -1=black
-humanPlayers = [false, true]; % white, black players are either AI or human player
+humanPlayers = [true, false]; % white, black players are either AI or human player
 
 while(true)
     if team == 1 && humanPlayers(1) || team == -1 && humanPlayers(2)
@@ -12,10 +12,12 @@ while(true)
     else
         fprintf('Team %s played by AI - ', teamName(team));
         tic;
-        [startX, startY, endX, endY] = playAIMove(team, Board);
+        [startX, startY, endX, endY] = playAIMove(previousMoves, team, Board);
         toc;
     end
   
+    previousMoves(end + 1, :) = { algebraic.stringify(startX, startY, endX, endY, team, Board) };
+    disp(previousMoves);
     [~, Board] = playMove(startX, startY, endX, endY, Board);
     displayBoard(Board);
 
@@ -32,8 +34,15 @@ while(true)
     
 end
 
-function [startX, startY, endX, endY] = playAIMove(team, Board)
-    [startX, startY, endX, endY] = computeAI(2, team, -1E9, +1E9, Board);
+function [startX, startY, endX, endY] = playAIMove(previousMoves, team, Board)
+    if size(previousMoves, 1) < 8
+        [success, startX, startY, endX, endY] = computeOpening(Board, previousMoves);
+        if ~success
+            [startX, startY, endX, endY] = computeAI(2, team, -1E9, +1E9, Board);
+        end
+    else
+        [startX, startY, endX, endY] = computeAI(2, team, -1E9, +1E9, Board);
+    end
 end
 
 function [startX, startY, endX, endY] = playUserMove(team, Board)
