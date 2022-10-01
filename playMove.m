@@ -1,4 +1,4 @@
-function [success, Board] = computeMove(startX, startY, endX, endY, Board)
+function [success, Board] = playMove(startX, startY, endX, endY, Board)
     team = sign(Board(startX, startY));
     Board(Board == team * 9) = team * 6;
     PostBoard = Board;
@@ -48,5 +48,5 @@ function [success, Board] = computeMove(startX, startY, endX, endY, Board)
 end
 
 function [x, y] = searchKing(team, Board)
-    [x,y] = find(Board == team * 1 | Board == team * 7);
+    [x, y] = find(Board == team * 1 | Board == team * 7);
 end

@@ -1,65 +1,27 @@
 Board = createBoard();
 openGame(Board)
 displayBoard(Board);
-shg
-lastX = 0;
-lastY = 0;
-x = 4;
-y = 4;
-team = 1;
+
+team = 1; % team: 1=white, -1=black
+
+humanPlayers = [false, true]; % white, black players are either AI or human player
 while(true)
-    pos = [];
-    success = false;
-    while(not(success))
-        if(team == 0)
-            [x, y] = userInput();
-        else
-            if(team == 1)
-                fprintf('White - ');
-            else
-                fprintf('Black - ');
-            end
-            tic;
-            [a, b, c, d, val] = computeIA(4, team, -1000000000, 1000000000, Board);
-            toc;
-            lastX = a;
-            lastY = b;
-            x = c;
-            y = d;
-            pos = [[c, d]];
-        end
-        if(not(isempty(pos)) && any(ismember(pos, [x, y], 'rows')))
-            [success, Board] = computeMove(lastX, lastY, x, y, Board);
-        else
-            pos = getPositions(x, y, Board);
-            if(sign(Board(x, y)) ~= team)
-                pos = [];
-            end
-            lastX = x;
-            lastY = y;
-        end
-        displayBoard(Board);
-        if(size(pos) > 0)
-            selectPawn(x, y, 45);
-        end
-        for i = 1:size(pos, 1)
-            if(Board(pos(i, 1), pos(i, 2)) == 0)
-                drawPoint(pos(i, 1), pos(i, 2), 45);
-            else
-                drawTarget(pos(i, 1), pos(i, 2), 45);
-            end
-        end
-    
+    if team == 1 && humanPlayers(1) || team == -1 && humanPlayers(2)
+        fprintf('Team %s played by human\n', teamName(team));
+        [startX, startY, endX, endY] = playUserMove(team, Board);
+    else
+        fprintf('Team %s played by AI - ', teamName(team));
+        tic;
+        [startX, startY, endX, endY] = playAIMove(team, Board);
+        toc;
     end
+  
+    [~, Board] = playMove(startX, startY, endX, endY, Board);
     displayBoard(Board);
-    shg
+
     win = isWin(team, Board);
     if(win == 1)
-        if(team == 1)
-            fprintf('white wins !\n');
-        else
-            fprintf('black wins !\n');
-        end
+        fprintf('%s wins !\n', teamName(team));
         break;
     elseif(win == -1)
         fprintf('pat\n');
@@ -70,8 +32,52 @@ while(true)
     
 end
 
+function [startX, startY, endX, endY] = playAIMove(team, Board)
+    [startX, startY, endX, endY] = computeAI(2, team, -1E9, +1E9, Board);
+end
+
+function [startX, startY, endX, endY] = playUserMove(team, Board)
+    targetPos = zeros(0, 2);
+
+    while true
+        [x, y] = userInput();
+
+        % the user clicked on one of its pieces
+        if sign(Board(x, y)) == team 
+            startX = x;
+            startY = y;
+            targetPos = listMoves(startX, startY, Board);
+            
+            % update display
+            displayBoard(Board);
+            drawSelectedPiece(startX, startY, 45);
+            for i = 1:size(targetPos, 1)
+                if(Board(targetPos(i, 1), targetPos(i, 2)) == 0)
+                    drawPoint(targetPos(i, 1), targetPos(i, 2), 45);
+                else
+                    drawTarget(targetPos(i, 1), targetPos(i, 2), 45);
+                end
+            end
+        
+        % the user clicked on a possible move
+        elseif any(ismember(targetPos, [x, y], 'rows'))
+            endX = x;
+            endY = y;
+            return;
+        end
+    end
+end
+
+function name = teamName(team)
+    if team == 1
+        name = 'white';
+    else
+        name = 'black';
+    end
+end
+
 function [Board] = createBoard()
-    Board = zeros(8,8);
+    Board = zeros(8,8, 'int8');
     % 1 : king
     % 2 : queen
     % 3 : bishop
@@ -119,12 +125,7 @@ function im = getPieceImage(im, index)
         return;
     end
 
-    lookup = containers.Map({
-        1, 2, 3, 4, 5, 6, 7, 8, 9
-    }, {
-        0, 1, 2, 3, 4, 5, 0, 4, 5
-    });
-
+    lookup = [0, 1, 2, 3, 4, 5, 0, 4, 5];
     x = w * lookup(abs(index));
     y = h * (index < 0);
 
@@ -151,9 +152,11 @@ function [] = displayBoard(Board)
     hold off
 end
 
-% draw a circle in tile (x, y).
-function [] = drawPoint(x, y, tileWidth)
+% draw a circle in tile (x, y). (possible moves for a selected piece)
+function h = drawPoint(x, y, tileWidth)
     hold on
+    x = double(x);
+    y = double(y);
     theta = 0:pi/50:2*pi;
     x = (x - 0.5 + cos(theta) * 0.15) * tileWidth;
     y = (y - 0.5 + sin(theta) * 0.15) * tileWidth;
@@ -161,34 +164,37 @@ function [] = drawPoint(x, y, tileWidth)
     hold off
 end
 
-% draw a target in tile (x, y).
-function [] = drawTarget(x, y, tileWidth)
+% draw a target in tile (x, y). (adversary pieces to take)
+function h = drawTarget(x, y, tileWidth)
     hold on
+    x = double(x);
+    y = double(y);
     theta = 0:pi/50:2*pi;
     xVals = [x * tileWidth, x * tileWidth, (x - 1) * tileWidth, (x - 1) * tileWidth, x * tileWidth, x * tileWidth];
     yVals = [(y - 0.5) * tileWidth, (y - 1) * tileWidth, (y - 1) * tileWidth, y * tileWidth, y * tileWidth, (y - 0.5) * tileWidth];
-    xVals = [xVals, (x - 0.5 + cos(theta) * 0.45) * tileWidth];
+    xVals = [xVals, (cos(theta) * 0.45 - 0.5 + x) * tileWidth];
     yVals = [yVals, (y - 0.5 + sin(theta) * 0.45) * tileWidth];
     h = fill(yVals, xVals, 'green', 'EdgeColor', 'none', 'FaceAlpha', 0.5);
     hold off
 end
 
-% draw a selection in tile (x, y).
-function [] = selectPawn(x, y, tileWidth)
+% draw a selection in tile (x, y). (selected piece before moving)
+function h = drawSelectedPiece(x, y, tileWidth)
     hold on
-    theta = 0:pi/50:2*pi;
+    x = double(x);
+    y = double(y);
     xVals = [x * tileWidth, (x - 1) * tileWidth, (x - 1) * tileWidth, x * tileWidth];
     yVals = [(y - 1) * tileWidth, (y - 1) * tileWidth, y * tileWidth, y * tileWidth];
     h = fill(yVals, xVals, 'green', 'EdgeColor', 'none', 'FaceAlpha', 0.5);
     hold off
 end
 
+% wait for the user to click on a tile and return its coordinates
 function [x, y] = userInput()
     [pixX,pixY,~] = ginput(1);
     x = floor(pixY / 45) + 1;
     y = floor(pixX / 45) + 1;
     x = min(max(x, 1), 8);
     y = min(max(y, 1), 8);
-
 end
   
