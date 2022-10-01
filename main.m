@@ -4,7 +4,7 @@ displayBoard(Board);
 
 team = 1; % team: 1=white, -1=black
 
-humanPlayers = [false, true]; % white, black players are either AI or human player
+humanPlayers = [true, true]; % white, black players are either AI or human player
 while(true)
     if team == 1 && humanPlayers(1) || team == -1 && humanPlayers(2)
         fprintf('Team %s played by human\n', teamName(team));
@@ -162,6 +162,7 @@ function h = drawPoint(x, y, tileWidth)
     y = (y - 0.5 + sin(theta) * 0.15) * tileWidth;
     h = fill(y, x, 'green', 'EdgeColor', 'none', 'FaceAlpha', 0.5);
     hold off
+    shg
 end
 
 % draw a target in tile (x, y). (adversary pieces to take)
