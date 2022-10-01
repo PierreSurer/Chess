@@ -1,45 +1,69 @@
 function moves = kingMoves(x, y, Board)
-    moves = zeros(0, 2, 'int8');
+    moves = zeros(8, 2, 'int8');
+    idx = 0;
     team = sign(Board(x, y));
 
     % normal moves
-    if(x + 1 < 9)
-        if(sign(Board(x + 1, y)) ~= team)
-            moves(end + 1, :) = [x + 1, y];
+    tmpX = x + 1;
+    if(tmpX < 9)
+        tmpY = y - 1;
+        if(tmpY > 0 && sign(Board(tmpX, tmpY)) ~= team)
+            idx = idx + 1;
+            moves(idx, :) = [tmpX, tmpY];
         end
-        if(y + 1 < 9 && sign(Board(x + 1, y + 1)) ~= team)
-            moves(end + 1, :) = [x + 1, y + 1];
+        if(sign(Board(tmpX, y)) ~= team)
+            idx = idx + 1;
+            moves(idx, :) = [tmpX, y];
         end
-        if(y - 1 > 0 && sign(Board(x + 1, y - 1)) ~= team)
-            moves(end + 1, :) = [x + 1, y - 1];
-        end
-    end
-    if(x - 1 > 0)
-        if(sign(Board(x - 1, y)) ~= team)
-            moves(end + 1, :) = [x - 1, y];
-        end
-        if(y + 1 < 9 && sign(Board(x - 1, y + 1)) ~= team)
-            moves(end + 1, :) = [x - 1, y + 1];
-        end
-        if(y - 1 > 0 && sign(Board(x - 1, y - 1)) ~= team)
-            moves(end + 1, :) = [x - 1, y - 1];
+        tmpY = y + 1;
+        if(tmpY < 9 && sign(Board(tmpX, tmpY)) ~= team)
+            idx = idx + 1;
+            moves(idx, :) = [tmpX, tmpY];
         end
     end
-    if(y + 1 < 9 && sign(Board(x, y + 1)) ~= team)
-        moves(end + 1, :) = [x, y + 1];
+
+    tmpX = x - 1;
+    if(tmpX > 0)
+        tmpY = y - 1;
+        if(tmpY > 0 && sign(Board(tmpX, tmpY)) ~= team)
+            idx = idx + 1;
+            moves(idx, :) = [tmpX, tmpY];
+        end
+        if(sign(Board(tmpX, y)) ~= team)
+            idx = idx + 1;
+            moves(idx, :) = [tmpX, y];
+        end
+        tmpY = y + 1;
+        if(tmpY < 9 && sign(Board(tmpX, tmpY)) ~= team)
+            idx = idx + 1;
+            moves(idx, :) = [tmpX, tmpY];
+        end
     end
-    if(y - 1 > 0 && sign(Board(x, y - 1)) ~= team)
-        moves(end + 1, :) = [x, y - 1];
+
+    tmpY = y + 1;
+    if(tmpY < 9 && sign(Board(x, tmpY)) ~= team)
+        idx = idx + 1;
+        moves(idx, :) = [x, tmpY];
     end
+    
+    tmpY = y - 1;
+    if(tmpY > 0 && sign(Board(x, tmpY)) ~= team)
+        idx = idx + 1;
+        moves(idx, :) = [x, tmpY];
+    end
+
     % castle
     if(abs(Board(x, y)) == 1 && abs(Board(x + 3, y)) == 5)
         if(Board(x + 1, y) == 0 && Board(x + 2, y) == 0)
-            moves(end + 1, :) = [x + 2, y];
+            idx = idx + 1;
+            moves(idx, :) = [x + 2, y];
         end
     end
     if(abs(Board(x, y)) == 1 && abs(Board(x - 4, y)) == 5)
         if(Board(x - 1, y) == 0 && Board(x - 2, y) == 0 && Board(x - 3, y) == 0)
-            moves(end + 1, :) = [x - 2, y];
+            idx = idx + 1;
+            moves(idx, :) = [x - 2, y];
         end
     end
+    moves = moves(1:idx, :);
 end

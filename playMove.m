@@ -1,4 +1,4 @@
-function [success, Board] = playMove(startX, startY, endX, endY, Board)
+function [success, PostBoard] = playMove(startX, startY, endX, endY, Board)
     team = sign(Board(startX, startY));
     Board(Board == team * 9) = team * 6;
     PostBoard = Board;
@@ -38,15 +38,9 @@ function [success, Board] = playMove(startX, startY, endX, endY, Board)
         PostBoard(4, startY) = team * 8;
         PostBoard(1, startY) = 0;
     end
-    [x, y] = searchKing(team, PostBoard);
-    if(isKingChessed(x, y, PostBoard))
+    if(isKingChessed(team, PostBoard))
         success = false;
     else
         success = true;
-        Board = PostBoard;
     end
-end
-
-function [x, y] = searchKing(team, Board)
-    [x, y] = find(Board == team * 1 | Board == team * 7);
 end

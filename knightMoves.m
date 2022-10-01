@@ -1,38 +1,62 @@
 function moves = knightMoves(x, y, Board)
-    moves = zeros(0, 2, 'int8');
+    moves = zeros(8, 2, 'int8');
+    idx = 0;
     team = sign(Board(x, y));
 
-    if(x + 1 < 9)
-        if(y - 2 > 0 && sign(Board(x + 1, y - 2)) ~= team)
-            moves(end + 1, :) = [x + 1, y - 2];
+    tmpX = x + 1;
+    if(tmpX < 9)
+        tmpY = y - 2;
+        if(tmpY > 0 && sign(Board(tmpX, tmpY)) ~= team)
+            idx = idx + 1;
+            moves(idx, :) = [tmpX, tmpY];
         end
-        if(y + 2 < 9 && sign(Board(x + 1, y + 2)) ~= team)
-            moves(end + 1, :) = [x + 1, y + 2];
-        end
-    end
-    if(x - 1 > 0)
-        if(y - 2 > 0 && sign(Board(x - 1, y - 2)) ~= team)
-            moves(end + 1, :) = [x - 1, y - 2];
-        end
-        if(y + 2 < 9 && sign(Board(x - 1, y + 2)) ~= team)
-            moves(end + 1, :) = [x - 1, y + 2];
+        tmpY = y + 2;
+        if(tmpY < 9 && sign(Board(tmpX, tmpY)) ~= team)
+            idx = idx + 1;
+            moves(idx, :) = [tmpX, tmpY];
         end
     end
-    if(y + 1 < 9)
-        if(x - 2 > 0 && sign(Board(x - 2, y + 1)) ~= team)
-            moves(end + 1, :) = [x - 2, y + 1];
+
+    tmpX = x - 1;
+    if(tmpX > 0)
+        tmpY = y - 2;
+        if(tmpY > 0 && sign(Board(tmpX, tmpY)) ~= team)
+            idx = idx + 1;
+            moves(idx, :) = [tmpX, tmpY];
         end
-        if(x + 2 < 9 && sign(Board(x + 2, y + 1)) ~= team)
-            moves(end + 1, :) = [x + 2, y + 1];
-        end
-    end
-    if(y - 1 > 0)
-        if(x - 2 > 0 && sign(Board(x - 2, y - 1)) ~= team)
-            moves(end + 1, :) = [x - 2, y - 1];
-        end
-        if(x + 2 < 9 && sign(Board(x + 2, y - 1)) ~= team)
-            moves(end + 1, :) = [x + 2, y - 1];
+        tmpY = y + 2;
+        if(tmpY < 9 && sign(Board(tmpX, tmpY)) ~= team)
+            idx = idx + 1;
+            moves(idx, :) = [tmpX, tmpY];
         end
     end
-    return;
+
+    tmpY = y + 1;
+    if(tmpY < 9)
+        tmpX = x - 2;
+        if(tmpX > 0 && sign(Board(tmpX, tmpY)) ~= team)
+            idx = idx + 1;
+            moves(idx, :) = [tmpX, tmpY];
+        end
+        tmpX = x + 2;
+        if(tmpX < 9 && sign(Board(tmpX, tmpY)) ~= team)
+            idx = idx + 1;
+            moves(idx, :) = [tmpX, tmpY];
+        end
+    end
+
+    tmpY = y - 1;
+    if(tmpY > 0)
+        tmpX = x - 2;
+        if(tmpX > 0 && sign(Board(tmpX, tmpY)) ~= team)
+            idx = idx + 1;
+            moves(idx, :) = [tmpX, tmpY];
+        end
+        tmpX = x + 2;
+        if(tmpX < 9 && sign(Board(tmpX, tmpY)) ~= team)
+            idx = idx + 1;
+            moves(idx, :) = [tmpX, tmpY];
+        end
+    end
+    moves = moves(1:idx, :);
 end

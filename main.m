@@ -3,7 +3,7 @@ displayBoard(Board);
 previousMoves = cell(0);
 
 team = 1; % team: 1=white, -1=black
-humanPlayers = [true, false]; % white, black players are either AI or human player
+humanPlayers = [false, false]; % white, black players are either AI or human player
 
 while(true)
     if team == 1 && humanPlayers(1) || team == -1 && humanPlayers(2)
@@ -15,9 +15,9 @@ while(true)
         [startX, startY, endX, endY] = playAIMove(previousMoves, team, Board);
         toc;
     end
-  
+
     previousMoves(end + 1, :) = { algebraic.stringify(startX, startY, endX, endY, team, Board) };
-    disp(previousMoves);
+
     [~, Board] = playMove(startX, startY, endX, endY, Board);
     displayBoard(Board);
 
@@ -38,10 +38,10 @@ function [startX, startY, endX, endY] = playAIMove(previousMoves, team, Board)
     if size(previousMoves, 1) < 8
         [success, startX, startY, endX, endY] = computeOpening(Board, previousMoves);
         if ~success
-            [startX, startY, endX, endY] = computeAI(2, team, -1E9, +1E9, Board);
+            [startX, startY, endX, endY] = computeAI(3, team, -1E9, +1E9, Board);
         end
     else
-        [startX, startY, endX, endY] = computeAI(2, team, -1E9, +1E9, Board);
+        [startX, startY, endX, endY] = computeAI(3, team, -1E9, +1E9, Board);
     end
 end
 
@@ -159,6 +159,7 @@ function [] = displayBoard(Board)
     h = imshow(imgs);
     set(h, 'AlphaData', alphas);
     hold off
+    shg
 end
 
 % draw a circle in tile (x, y). (possible moves for a selected piece)
@@ -171,7 +172,6 @@ function h = drawPoint(x, y, tileWidth)
     y = (y - 0.5 + sin(theta) * 0.15) * tileWidth;
     h = fill(y, x, 'green', 'EdgeColor', 'none', 'FaceAlpha', 0.5);
     hold off
-    shg
 end
 
 % draw a target in tile (x, y). (adversary pieces to take)

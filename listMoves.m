@@ -1,31 +1,31 @@
 function moves = listMoves(x, y, Board) 
-    current = Board(x, y);
+    current = abs(Board(x, y));
     if(current == 0)
        moves = zeros(0, 2, 'int8');
     
     % if pawn
-    elseif(abs(current) == 6 || abs(current) == 9) 
+    elseif(current == 6 || current == 9) 
         moves = pawnMoves(x, y, Board);
     
     % if rook
-    elseif(abs(current) == 5 || abs(current) == 8)
+    elseif(current == 5 || current == 8)
        moves = rookMoves(x, y, Board);
 
     % if knight
-    elseif(abs(current) == 4)
+    elseif(current == 4)
         moves = knightMoves(x, y, Board);
 
     % if bishop
-    elseif(abs(current) == 3)
+    elseif(current == 3)
         moves = bishopMoves(x, y, Board);
 
     % if queen
-    elseif(abs(current) == 2)
+    elseif(current == 2)
         moves = bishopMoves(x, y, Board);
         moves = cat(1, moves, rookMoves(x, y, Board));
 
     % if king
-    elseif(abs(current) == 1 || abs(current) == 7)
+    elseif(current == 1 || current == 7)
         moves = kingMoves(x, y, Board);
 
     end

@@ -34,7 +34,7 @@ function [startX, startY, endX, endY, val] = computeAI(depth, team, alpha, beta,
         val = -1000000000;
         for move = 1:size(possibleMoves)
             [~, nextBoard] = playMove(possibleMoves(idx(move), 1), possibleMoves(idx(move), 2), possibleMoves(idx(move), 3), possibleMoves(idx(move), 4), Board);
-            [~, ~, ~, ~, tmpVal] = computeAI(depth - 1, -team, -beta, -alpha, nextBoard); % TODO : reuse moves
+            [~, ~, ~, ~, tmpVal] = computeAI(depth - 1, -team, -beta, -alpha, nextBoard);
             if(-tmpVal > val)
                 startX = possibleMoves(idx(move), 1);
                 startY = possibleMoves(idx(move), 2);
@@ -44,7 +44,7 @@ function [startX, startY, endX, endY, val] = computeAI(depth, team, alpha, beta,
             end
             alpha = max(alpha, val);
             if(alpha >= beta)
-                return;
+                break;
             end
         end
     end

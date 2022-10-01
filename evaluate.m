@@ -1,29 +1,13 @@
 function [val] = evaluate(team, Board)
-    [x, y] = find(sign(Board) == team);
-    [x2, y2] = find(sign(Board) == -team);
-    if(team == 1)
-        teamVal = sum(arrayfun(@(a, b) getPieceVal(abs(Board(a, b))) * getHeatmap(a, b), x, y));
-        enemyVal = sum(arrayfun(@(a, b) getPieceVal(abs(Board(a, b))) * getHeatmap(a, 9 - b), x2, y2));
-        val = teamVal - enemyVal;
-    else
-        teamVal = sum(arrayfun(@(a, b) getPieceVal(abs(Board(a, b))) * getHeatmap(a, 9 - b), x, y));
-        enemyVal = sum(arrayfun(@(a, b) getPieceVal(abs(Board(a, b))) * getHeatmap(a, b), x2, y2));
-        val = teamVal - enemyVal;
-    end
+    [x, y] = find(Board ~= 0);
+    val = team * sum(arrayfun(@(a, b) getPieceVal(a, b, Board(a, b)), x, y));
 
 end
 
-function [val] = getPieceVal(val)
-    persistent values
-    if isempty(values)
+function [val] = getPieceVal(x, y, piece)
+
         values = [-1, 11, 6, 4, 8, 1, -1, 8, 1];
-    end
-    val = values(val);
-end
 
-function [val] = getHeatmap(x, y)
-    persistent heatmap
-    if isempty(heatmap)
         heatmap = [
            0, 0, 0, 0, 0, 0, 0, 0;
            0, 0, 0, 0, 0, 0, 0, 0;
@@ -34,6 +18,10 @@ function [val] = getHeatmap(x, y)
            4, 4, 5, 5, 5, 5, 4, 4;
            5, 5, 6, 6, 6, 6, 5, 5
         ] / 64;
+
+    if(sign(piece) == 1)
+        val = values(abs(piece)) * (1 + heatmap(x, y));
+    else
+        val = -values(abs(piece)) * (1 + heatmap(x, 9 - y));
     end
-    val = 1 + heatmap(x, y);
 end
