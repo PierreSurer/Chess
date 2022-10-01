@@ -1,11 +1,13 @@
 function moves = rookMoves(x, y, Board)
     moves = zeros(0, 2, 'int8');
+    team = sign(Board(x, y));
+
     tmpX = x - 1;
     while(tmpX > 0 && Board(tmpX, y) == 0)
         moves(end + 1, :) = [tmpX, y];
         tmpX = tmpX - 1;
     end
-    if(tmpX > 0 && sign(Board(tmpX, y)) == -sign(Board(x, y)))
+    if(tmpX > 0 && sign(Board(tmpX, y)) == -team)
         moves(end + 1, :) = [tmpX, y];
     end
 
@@ -14,7 +16,7 @@ function moves = rookMoves(x, y, Board)
         moves(end + 1, :) = [tmpX, y];
         tmpX = tmpX + 1;
     end
-    if(tmpX < 9 && sign(Board(tmpX, y)) == -sign(Board(x, y)))
+    if(tmpX < 9 && sign(Board(tmpX, y)) == -team)
         moves(end + 1, :) = [tmpX, y];
     end
 
@@ -23,7 +25,7 @@ function moves = rookMoves(x, y, Board)
         moves(end + 1, :) = [x, tmpY];
         tmpY = tmpY - 1;
     end
-    if(tmpY > 0 && sign(Board(x, tmpY)) == -sign(Board(x, y)))
+    if(tmpY > 0 && sign(Board(x, tmpY)) == -team)
         moves(end + 1, :) = [x, tmpY];
     end
 
@@ -32,7 +34,7 @@ function moves = rookMoves(x, y, Board)
         moves(end + 1, :) = [x, tmpY];
         tmpY = tmpY + 1;
     end
-    if(tmpY < 9 && sign(Board(x, tmpY)) == -sign(Board(x, y)))
+    if(tmpY < 9 && sign(Board(x, tmpY)) == -team)
         moves(end + 1, :) = [x, tmpY];
     end
     return;

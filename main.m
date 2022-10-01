@@ -3,8 +3,8 @@ openGame(Board)
 displayBoard(Board);
 
 team = 1; % team: 1=white, -1=black
+humanPlayers = [false, true]; % white, black players are either AI or human player
 
-humanPlayers = [true, true]; % white, black players are either AI or human player
 while(true)
     if team == 1 && humanPlayers(1) || team == -1 && humanPlayers(2)
         fprintf('Team %s played by human\n', teamName(team));
