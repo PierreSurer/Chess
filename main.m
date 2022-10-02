@@ -1,9 +1,9 @@
 Board = createBoard();
-displayBoard(Board);
+displayBoard(Board, 1);
 previousMoves = cell(0);
 
 team = 1; % team: 1=white, -1=black
-humanPlayers = [false, false]; % white, black players are either AI or human player
+humanPlayers = [false, true]; % white, black players are either AI or human player
 
 while(true)
     if team == 1 && humanPlayers(1) || team == -1 && humanPlayers(2)
@@ -19,7 +19,11 @@ while(true)
     previousMoves(end + 1, :) = { algebraic.stringify(startX, startY, endX, endY, team, Board) };
 
     [~, Board] = playMove(startX, startY, endX, endY, Board);
-    displayBoard(Board);
+    if(team == 1 && humanPlayers(2) || not(humanPlayers(1)))
+        displayBoard(Board, -1);
+    else
+        displayBoard(Board, 1)
+    end
 
     win = isWin(team, Board);
     if(win == 1)
@@ -38,10 +42,10 @@ function [startX, startY, endX, endY] = playAIMove(previousMoves, team, Board)
     if size(previousMoves, 1) < 8
         [success, startX, startY, endX, endY] = computeOpening(Board, previousMoves);
         if ~success
-            [startX, startY, endX, endY] = computeAI(3, team, -1E9, +1E9, Board);
+            [startX, startY, endX, endY] = computeAI(4, team, -1E9, +1E9, Board);
         end
     else
-        [startX, startY, endX, endY] = computeAI(3, team, -1E9, +1E9, Board);
+        [startX, startY, endX, endY] = computeAI(4, team, -1E9, +1E9, Board);
     end
 end
 
@@ -49,7 +53,7 @@ function [startX, startY, endX, endY] = playUserMove(team, Board)
     targetPos = zeros(0, 2);
 
     while true
-        [x, y] = userInput();
+        [x, y] = userInput(team);
 
         % the user clicked on one of its pieces
         if sign(Board(x, y)) == team 
@@ -58,13 +62,13 @@ function [startX, startY, endX, endY] = playUserMove(team, Board)
             targetPos = listMoves(startX, startY, Board);
             
             % update display
-            displayBoard(Board);
-            drawSelectedPiece(startX, startY, 45);
+            displayBoard(Board, team);
+            drawSelectedPiece(startX, startY, 45, team);
             for i = 1:size(targetPos, 1)
                 if(Board(targetPos(i, 1), targetPos(i, 2)) == 0)
-                    drawPoint(targetPos(i, 1), targetPos(i, 2), 45);
+                    drawPoint(targetPos(i, 1), targetPos(i, 2), 45, team);
                 else
-                    drawTarget(targetPos(i, 1), targetPos(i, 2), 45);
+                    drawTarget(targetPos(i, 1), targetPos(i, 2), 45, team);
                 end
             end
         
@@ -141,20 +145,34 @@ function im = getPieceImage(im, index)
     im = im(1+y:y+h, 1+x:x+w);
 end
 
-function [] = displayBoard(Board)
+function [] = displayBoard(Board, side)
+    Board = Board.';
+    if(side == 1)
+        Board = flip(Board, 1);
+    end
     [im, ~, alpha] = imread('pieces.png');
     imgs = arrayfun(@(x) getPieceImage(im, x), Board, 'UniformOutput', false);
     alphas = arrayfun(@(x) getPieceImage(alpha, x), Board, 'UniformOutput', false);
     imgs = cell2mat(imgs);
     alphas = cell2mat(alphas);
     
-    tile = [181 136 99; 240 217 181; 240 217 181; 181 136 99] / 255;
+    tile = [240 217 181; 181 136 99; 181 136 99; 240 217 181] / 255;
     tile = reshape(tile, [2, 2, 3]);
     s = size(imgs);
     checker = repmat(tile, 4);
     checker = imresize(checker, s(1) / 8, 'nearest');
-
     imshow(checker);
+    txt = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    colors = [240 217 181; 181 136 99] / 255;
+    for i = 1:8
+        if(side == 1)
+            text((8 - 0.03) * s(1) / 8, (i - 1.03) * s(1) / 8, string(9 - i), 'Color', colors(1 + mod(i + 1,2), :), 'FontSize', s(1) / 50 ,'VerticalAlignment', 'top', 'HorizontalAlignment', 'right');
+        else
+            text((8 - 0.03) * s(1) / 8, (i - 1.03) * s(1) / 8, string(i), 'Color', colors(1 + mod(i + 1,2), :), 'FontSize', s(1) / 50 ,'VerticalAlignment', 'top', 'HorizontalAlignment', 'right');
+        end
+        text((i - 0.97) * s(1) / 8, (8 - 0.03) * s(1) / 8, txt(i), 'Color', colors(1 + mod(i + 1,2), :), 'FontSize', s(1) / 50 , 'VerticalAlignment', 'baseline', 'HorizontalAlignment', 'left');
+    end
+
     hold on
     h = imshow(imgs);
     set(h, 'AlphaData', alphas);
@@ -163,48 +181,60 @@ function [] = displayBoard(Board)
 end
 
 % draw a circle in tile (x, y). (possible moves for a selected piece)
-function h = drawPoint(x, y, tileWidth)
+function h = drawPoint(x, y, tileWidth, side)
     hold on
     x = double(x);
     y = double(y);
+    if(side == 1)
+        y = 9 - y;
+    end
     theta = 0:pi/50:2*pi;
     x = (x - 0.5 + cos(theta) * 0.15) * tileWidth;
     y = (y - 0.5 + sin(theta) * 0.15) * tileWidth;
-    h = fill(y, x, 'green', 'EdgeColor', 'none', 'FaceAlpha', 0.5);
+    h = fill(x, y, 'green', 'EdgeColor', 'none', 'FaceAlpha', 0.5);
     hold off
 end
 
 % draw a target in tile (x, y). (adversary pieces to take)
-function h = drawTarget(x, y, tileWidth)
+function h = drawTarget(x, y, tileWidth, side)
     hold on
     x = double(x);
     y = double(y);
+    if(side == 1)
+        y = 9 - y;
+    end
     theta = 0:pi/50:2*pi;
     xVals = [x * tileWidth, x * tileWidth, (x - 1) * tileWidth, (x - 1) * tileWidth, x * tileWidth, x * tileWidth];
     yVals = [(y - 0.5) * tileWidth, (y - 1) * tileWidth, (y - 1) * tileWidth, y * tileWidth, y * tileWidth, (y - 0.5) * tileWidth];
     xVals = [xVals, (cos(theta) * 0.45 - 0.5 + x) * tileWidth];
     yVals = [yVals, (y - 0.5 + sin(theta) * 0.45) * tileWidth];
-    h = fill(yVals, xVals, 'green', 'EdgeColor', 'none', 'FaceAlpha', 0.5);
+    h = fill(xVals, yVals, 'green', 'EdgeColor', 'none', 'FaceAlpha', 0.5);
     hold off
 end
 
 % draw a selection in tile (x, y). (selected piece before moving)
-function h = drawSelectedPiece(x, y, tileWidth)
+function h = drawSelectedPiece(x, y, tileWidth, side)
     hold on
     x = double(x);
     y = double(y);
+    if(side == 1)
+        y = 9 - y;
+    end
     xVals = [x * tileWidth, (x - 1) * tileWidth, (x - 1) * tileWidth, x * tileWidth];
     yVals = [(y - 1) * tileWidth, (y - 1) * tileWidth, y * tileWidth, y * tileWidth];
-    h = fill(yVals, xVals, 'green', 'EdgeColor', 'none', 'FaceAlpha', 0.5);
+    h = fill(xVals, yVals, 'green', 'EdgeColor', 'none', 'FaceAlpha', 0.5);
     hold off
 end
 
 % wait for the user to click on a tile and return its coordinates
-function [x, y] = userInput()
-    [pixX,pixY,~] = ginput(1);
+function [x, y] = userInput(side)
+    [pixY,pixX,~] = ginput(1);
     x = floor(pixY / 45) + 1;
     y = floor(pixX / 45) + 1;
     x = min(max(x, 1), 8);
     y = min(max(y, 1), 8);
+    if(side == 1)
+        y = 9 - y;
+    end
 end
   
