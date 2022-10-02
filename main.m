@@ -8,17 +8,17 @@ humanPlayers = [false, true]; % white, black players are either AI or human play
 while(true)
     if team == 1 && humanPlayers(1) || team == -1 && humanPlayers(2)
         fprintf('Team %s played by human\n', teamName(team));
-        [startX, startY, endX, endY] = playUserMove(team, Board);
+        [startPos, endPos] = playUserMove(team, Board);
     else
         fprintf('Team %s played by AI - ', teamName(team));
         tic;
-        [startX, startY, endX, endY] = playAIMove(previousMoves, team, Board);
+        [startPos, endPos] = playAIMove(previousMoves, team, Board);
         toc;
     end
 
-    previousMoves(end + 1, :) = { algebraic.stringify(startX, startY, endX, endY, team, Board) };
+    previousMoves(end + 1, :) = { algebraic.stringify(startPos, endPos, team, Board) };
 
-    [~, Board] = playMove(startX, startY, endX, endY, Board);
+    [~, Board] = playMove(startPos, endPos, Board);
     if(team == 1 && humanPlayers(2) || not(humanPlayers(1)))
         displayBoard(Board, -1);
     else
@@ -38,44 +38,42 @@ while(true)
     
 end
 
-function [startX, startY, endX, endY] = playAIMove(previousMoves, team, Board)
+function [startPos, endPos] = playAIMove(previousMoves, team, Board)
     if size(previousMoves, 1) < 8
-        [success, startX, startY, endX, endY] = computeOpening(Board, previousMoves);
+        [success, startPos, endPos] = computeOpening(Board, previousMoves);
         if ~success
-            [startX, startY, endX, endY] = computeAI(4, team, -1E9, +1E9, Board);
+            [startPos, endPos] = computeAI(4, team, -1E9, +1E9, Board);
         end
     else
-        [startX, startY, endX, endY] = computeAI(4, team, -1E9, +1E9, Board);
+        [startPos, endPos] = computeAI(4, team, -1E9, +1E9, Board);
     end
 end
 
-function [startX, startY, endX, endY] = playUserMove(team, Board)
-    targetPos = zeros(0, 2);
+function [startPos, endPos] = playUserMove(team, Board)
+    targetPos = zeros(0, 1);
 
     while true
-        [x, y] = userInput(team);
+        pos = userInput(team);
 
         % the user clicked on one of its pieces
-        if sign(Board(x, y)) == team 
-            startX = x;
-            startY = y;
-            targetPos = listMoves(startX, startY, Board);
+        if sign(Board(pos)) == team
+            startPos = pos;
+            targetPos = listMoves(startPos, Board);
             
             % update display
             displayBoard(Board, team);
-            drawSelectedPiece(startX, startY, 45, team);
+            drawSelectedPiece(pos, 45, team);
             for i = 1:size(targetPos, 1)
-                if(Board(targetPos(i, 1), targetPos(i, 2)) == 0)
-                    drawPoint(targetPos(i, 1), targetPos(i, 2), 45, team);
+                if(Board(targetPos(i)) == 0)
+                    drawPoint(targetPos(i), 45, team);
                 else
-                    drawTarget(targetPos(i, 1), targetPos(i, 2), 45, team);
+                    drawTarget(targetPos(i), 45, team);
                 end
             end
         
         % the user clicked on a possible move
-        elseif any(ismember(targetPos, [x, y], 'rows'))
-            endX = x;
-            endY = y;
+        elseif any(targetPos == pos)
+            endPos = pos;
             return;
         end
     end
@@ -90,7 +88,7 @@ function name = teamName(team)
 end
 
 function [Board] = createBoard()
-    Board = zeros(8,8, 'int8');
+    Board = zeros(8, 8, 'int8');
     % 1 : king
     % 2 : queen
     % 3 : bishop
@@ -180,11 +178,10 @@ function [] = displayBoard(Board, side)
     shg
 end
 
-% draw a circle in tile (x, y). (possible moves for a selected piece)
-function h = drawPoint(x, y, tileWidth, side)
+% draw a circle at pos. (possible moves for a selected piece)
+function h = drawPoint(pos, tileWidth, side)
     hold on
-    x = double(x);
-    y = double(y);
+    [x, y] = ind2sub([8 8], pos);
     if(side == 1)
         y = 9 - y;
     end
@@ -195,11 +192,10 @@ function h = drawPoint(x, y, tileWidth, side)
     hold off
 end
 
-% draw a target in tile (x, y). (adversary pieces to take)
-function h = drawTarget(x, y, tileWidth, side)
+% draw a target at pos. (adversary pieces to take)
+function h = drawTarget(pos, tileWidth, side)
     hold on
-    x = double(x);
-    y = double(y);
+    [x, y] = ind2sub([8 8], pos);
     if(side == 1)
         y = 9 - y;
     end
@@ -212,11 +208,10 @@ function h = drawTarget(x, y, tileWidth, side)
     hold off
 end
 
-% draw a selection in tile (x, y). (selected piece before moving)
-function h = drawSelectedPiece(x, y, tileWidth, side)
+% draw a selection at pos. (selected piece before moving)
+function h = drawSelectedPiece(pos, tileWidth, side)
     hold on
-    x = double(x);
-    y = double(y);
+    [x, y] = ind2sub([8 8], pos);
     if(side == 1)
         y = 9 - y;
     end
@@ -227,7 +222,7 @@ function h = drawSelectedPiece(x, y, tileWidth, side)
 end
 
 % wait for the user to click on a tile and return its coordinates
-function [x, y] = userInput(side)
+function pos = userInput(side)
     [pixY,pixX,~] = ginput(1);
     x = floor(pixY / 45) + 1;
     y = floor(pixX / 45) + 1;
@@ -236,5 +231,6 @@ function [x, y] = userInput(side)
     if(side == 1)
         y = 9 - y;
     end
+    pos = sub2ind([8 8], x, y);
 end
   

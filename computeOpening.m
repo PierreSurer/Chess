@@ -1,4 +1,4 @@
-function [success, startX, startY, endX, endY] = computeOpening(Board, previousMoves)
+function [success, startPos, endPos] = computeOpening(Board, previousMoves)
     persistent T;
     if isempty(T)
         opts = detectImportOptions('high_elo_opening.csv');
@@ -18,10 +18,8 @@ function [success, startX, startY, endX, endY] = computeOpening(Board, previousM
     end
 
     if size(table, 1) == 0
-        startX = -1;
-        startY = -1;
-        endX = -1;
-        endY = -1;
+        startPos = -1;
+        endPos = -1;
         success = false;
         return;
     else
@@ -34,7 +32,7 @@ function [success, startX, startY, endX, endY] = computeOpening(Board, previousM
     [~, best] = max(moveScores{:, 3}, [], 1);
     best = moveScores(best, 1);
     best = char(best{1, move});
-    [startX, startY, endX, endY] = algebraic.parse(best, team, Board);
+    [startPos, endPos] = algebraic.parse(best, team, Board);
 end
 
 
