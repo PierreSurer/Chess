@@ -3,7 +3,7 @@ displayBoard(Board, 1);
 previousMoves = cell(0);
 
 team = 1; % team: 1=white, -1=black
-humanPlayers = [false, true]; % white, black players are either AI or human player
+humanPlayers = [false, false]; % white, black players are either AI or human player
 
 while(true)
     if team == 1 && humanPlayers(1) || team == -1 && humanPlayers(2)
@@ -15,14 +15,13 @@ while(true)
         [startPos, endPos] = playAIMove(previousMoves, team, Board);
         toc;
     end
-
     previousMoves(end + 1, :) = { algebraic.stringify(startPos, endPos, team, Board) };
 
-    [~, Board] = playMove(startPos, endPos, Board);
-    if(team == 1 && humanPlayers(2) || not(humanPlayers(1)))
+    [Board] = playMove(startPos, endPos, Board);
+    if(team == 1 && humanPlayers(2) || not(humanPlayers(1)) && humanPlayers(2))
         displayBoard(Board, -1);
     else
-        displayBoard(Board, 1)
+        displayBoard(Board, 1);
     end
 
     win = isWin(team, Board);
@@ -42,10 +41,10 @@ function [startPos, endPos] = playAIMove(previousMoves, team, Board)
     if size(previousMoves, 1) < 8
         [success, startPos, endPos] = computeOpening(Board, previousMoves);
         if ~success
-            [startPos, endPos] = computeAI(4, team, -1E9, +1E9, Board);
+            [startPos, endPos] = computeAI(5, team, -1E7, +1E7, Board);
         end
     else
-        [startPos, endPos] = computeAI(4, team, -1E9, +1E9, Board);
+        [startPos, endPos] = computeAI(5, team, -1E7, +1E7, Board);
     end
 end
 
@@ -59,6 +58,13 @@ function [startPos, endPos] = playUserMove(team, Board)
         if sign(Board(pos)) == team
             startPos = pos;
             targetPos = listMoves(startPos, Board);
+            % only keep moves which are playable
+            moveSuccess = zeros(size(targetPos, 1), 1, 'logical');
+            for i = 1:size(targetPos)
+                TmpBoard = playMove(pos, targetPos(i), Board);
+                moveSuccess(i) = not(isKingChessed(team, TmpBoard)); 
+            end
+            targetPos = targetPos(moveSuccess, :);
             
             % update display
             displayBoard(Board, team);
@@ -154,7 +160,11 @@ function [] = displayBoard(Board, side)
     imgs = cell2mat(imgs);
     alphas = cell2mat(alphas);
     
-    tile = [240 217 181; 181 136 99; 181 136 99; 240 217 181] / 255;
+    if(side == 1)
+        tile = [240 217 181; 181 136 99; 181 136 99; 240 217 181] / 255;
+    else
+        tile = [181 136 99; 240 217 181; 240 217 181; 181 136 99] / 255;
+    end
     tile = reshape(tile, [2, 2, 3]);
     s = size(imgs);
     checker = repmat(tile, 4);
@@ -165,10 +175,12 @@ function [] = displayBoard(Board, side)
     for i = 1:8
         if(side == 1)
             text((8 - 0.03) * s(1) / 8, (i - 1.03) * s(1) / 8, string(9 - i), 'Color', colors(1 + mod(i + 1,2), :), 'FontSize', s(1) / 50 ,'VerticalAlignment', 'top', 'HorizontalAlignment', 'right');
+            text((i - 0.97) * s(1) / 8, (8 - 0.03) * s(1) / 8, txt(i), 'Color', colors(1 + mod(i + 1,2), :), 'FontSize', s(1) / 50 , 'VerticalAlignment', 'baseline', 'HorizontalAlignment', 'left');
         else
-            text((8 - 0.03) * s(1) / 8, (i - 1.03) * s(1) / 8, string(i), 'Color', colors(1 + mod(i + 1,2), :), 'FontSize', s(1) / 50 ,'VerticalAlignment', 'top', 'HorizontalAlignment', 'right');
+            text((8 - 0.03) * s(1) / 8, (i - 1.03) * s(1) / 8, string(i), 'Color', colors(1 + mod(i,2), :), 'FontSize', s(1) / 50 ,'VerticalAlignment', 'top', 'HorizontalAlignment', 'right');
+            text((i - 0.97) * s(1) / 8, (8 - 0.03) * s(1) / 8, txt(i), 'Color', colors(1 + mod(i,2), :), 'FontSize', s(1) / 50 , 'VerticalAlignment', 'baseline', 'HorizontalAlignment', 'left');
         end
-        text((i - 0.97) * s(1) / 8, (8 - 0.03) * s(1) / 8, txt(i), 'Color', colors(1 + mod(i + 1,2), :), 'FontSize', s(1) / 50 , 'VerticalAlignment', 'baseline', 'HorizontalAlignment', 'left');
+        
     end
 
     hold on

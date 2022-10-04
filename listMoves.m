@@ -28,12 +28,4 @@ function moves = listMoves(pos, Board)
     elseif(current == 1 || current == 7)
         moves = kingMoves(pos, Board);
     end
-    
-    % only keep moves which are playable - i.e. playMove() returns
-    % success=1
-    moveSuccess = zeros(size(moves, 1), 1, 'logical');
-    for i = 1:size(moves)
-        moveSuccess(i) = playMove(pos, moves(i), Board);
-    end
-    moves = moves(moveSuccess, :);
 end

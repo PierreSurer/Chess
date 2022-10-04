@@ -1,4 +1,4 @@
-function [success, PostBoard] = playMove(startPos, endPos, Board)
+function [PostBoard] = playMove(startPos, endPos, Board)
     team = sign(Board(startPos));
     Board(Board == team * 9) = team * 6; % disable en passant for current team
     PostBoard = Board;
@@ -39,10 +39,5 @@ function [success, PostBoard] = playMove(startPos, endPos, Board)
     if(endX == 3 && abs(Board(startPos)) == 1)
         PostBoard(4, startY) = team * 8;
         PostBoard(1, startY) = 0;
-    end
-    if(isKingChessed(team, PostBoard))
-        success = false;
-    else
-        success = true;
     end
 end
