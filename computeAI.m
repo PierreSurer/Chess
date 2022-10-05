@@ -1,5 +1,7 @@
 % compute the next move of the AI.
-function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
+% prev contains the ancestor moves in the recursive call and can be
+% initialized to zeros(0, 2).
+function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, prev, Board)
     if(isKingChessed(-team, Board)) % still chessed -> remove
         startPos = -1;
         endPos = -1;
@@ -21,11 +23,12 @@ function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
         [~, idx] = sort(taken, 'descend');
         val = -1E6; % 1E6 < 1E7
         for move = 1:size(possibleMoves)
-            [nextBoard] = playMove(possibleMoves(idx(move), 1), possibleMoves(idx(move), 2), Board);
-            [~, ~, tmpVal] = computeAI(depth - 1, -team, -beta, -alpha, nextBoard);
+            [thisStartPos, thisEndPos] = possibleMoves(idx(move));
+            [nextBoard] = playMove(thisStartPos, thisEndPos, Board);
+            [~, ~, tmpVal] = computeAI(depth - 1, -team, -beta, -alpha, [prev; [thisStartPos, thisEndPos]], nextBoard);
             if(-tmpVal > val)
-                startPos = possibleMoves(idx(move), 1);
-                endPos = possibleMoves(idx(move), 2);
+                startPos = thisStartPos;
+                endPos = thisEndPos;
                 val = -tmpVal;
                 if(val >= beta)
                     break;
