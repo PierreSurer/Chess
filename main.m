@@ -3,7 +3,7 @@ displayBoard(Board, 1);
 previousMoves = cell(0);
 
 team = 1; % team: 1=white, -1=black
-humanPlayers = [true, true]; % white, black players are either AI or human player
+humanPlayers = [false, false]; % white, black players are either AI or human player
 
 while(true)
     if team == 1 && humanPlayers(1) || team == -1 && humanPlayers(2)
@@ -41,10 +41,10 @@ function [startPos, endPos] = playAIMove(previousMoves, team, Board)
     if size(previousMoves, 1) < 8
         [success, startPos, endPos] = computeOpening(Board, previousMoves);
         if ~success
-            [startPos, endPos] = computeAI(5, team, -1E7, +1E7, Board);
+            [startPos, endPos] = computeAI(7, team, -1E7, +1E7, Board);
         end
     else
-        [startPos, endPos] = computeAI(5, team, -1E7, +1E7, Board);
+        [startPos, endPos] = computeAI(7, team, -1E7, +1E7, Board);
     end
 end
 
