@@ -1,8 +1,6 @@
 Board = createBoard();
 displayBoard(Board, 1);
 previousMoves = cell(0);
-memo = Memoize.Data;
-memo.Data = zeros(1, 1);
 
 team = 1; % team: 1=white, -1=black
 humanPlayers = [false, false]; % white, black players are either AI or human player
@@ -43,11 +41,14 @@ function [startPos, endPos] = playAIMove(previousMoves, team, Board)
     if size(previousMoves, 1) < 8
         [success, startPos, endPos] = computeOpening(Board, previousMoves);
         if ~success
-            [startPos, endPos] = computeAI(5, team, -1E7, +1E7, zeros(0, 2), Board);
+            [startPos, endPos] = computeAI(5, team, -1E7, +1E7, Board);
         end
     else
-        [startPos, endPos] = computeAI(5, team, -1E7, +1E7, zeros(0, 2), Board);
+        [startPos, endPos] = computeAI(5, team, -1E7, +1E7, Board);
     end
+    % reset memoization of board values
+    memo = Memoize;
+    memo.reset;
 end
 
 function [startPos, endPos] = playUserMove(team, Board)
