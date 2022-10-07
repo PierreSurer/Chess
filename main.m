@@ -41,10 +41,10 @@ function [startPos, endPos] = playAIMove(previousMoves, team, Board)
     if size(previousMoves, 1) < 8
         [success, startPos, endPos] = computeOpening(Board, previousMoves);
         if ~success
-            [startPos, endPos] = computeAI(5, team, -1E7, +1E7, Board);
+            [startPos, endPos] = computeAI(7, team, -1E7, +1E7, Board);
         end
     else
-        [startPos, endPos] = computeAI(5, team, -1E7, +1E7, Board);
+        [startPos, endPos] = computeAI(7, team, -1E7, +1E7, Board);
     end
     % reset memoization of board values
     memo = Memoize;
