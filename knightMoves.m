@@ -2,19 +2,19 @@ function moves = knightMoves(pos, Board)
     moves = zeros(8, 1, 'int8'); % initialized to the max number of moves
     idx = 0;
     team = sign(Board(pos));
-    [x, y] = ind2sub([8 8], pos);
+    [x, y] = ind2sub( pos);
 
     tmpX = x + 1;
     if(tmpX < 9)
         tmpY = y - 2;
         if(tmpY > 0 && sign(Board(tmpX, tmpY)) ~= team)
             idx = idx + 1;
-            moves(idx) = sub2ind([8 8], tmpX, tmpY);
+            moves(idx) = sub2ind(tmpX, tmpY);
         end
         tmpY = y + 2;
         if(tmpY < 9 && sign(Board(tmpX, tmpY)) ~= team)
             idx = idx + 1;
-            moves(idx) = sub2ind([8 8], tmpX, tmpY);
+            moves(idx) = sub2ind(tmpX, tmpY);
         end
     end
 
@@ -23,12 +23,12 @@ function moves = knightMoves(pos, Board)
         tmpY = y - 2;
         if(tmpY > 0 && sign(Board(tmpX, tmpY)) ~= team)
             idx = idx + 1;
-            moves(idx) = sub2ind([8 8], tmpX, tmpY);
+            moves(idx) = sub2ind(tmpX, tmpY);
         end
         tmpY = y + 2;
         if(tmpY < 9 && sign(Board(tmpX, tmpY)) ~= team)
             idx = idx + 1;
-            moves(idx) = sub2ind([8 8], tmpX, tmpY);
+            moves(idx) = sub2ind(tmpX, tmpY);
         end
     end
 
@@ -37,12 +37,12 @@ function moves = knightMoves(pos, Board)
         tmpX = x - 2;
         if(tmpX > 0 && sign(Board(tmpX, tmpY)) ~= team)
             idx = idx + 1;
-            moves(idx) = sub2ind([8 8], tmpX, tmpY);
+            moves(idx) = sub2ind(tmpX, tmpY);
         end
         tmpX = x + 2;
         if(tmpX < 9 && sign(Board(tmpX, tmpY)) ~= team)
             idx = idx + 1;
-            moves(idx) = sub2ind([8 8], tmpX, tmpY);
+            moves(idx) = sub2ind(tmpX, tmpY);
         end
     end
 
@@ -51,12 +51,12 @@ function moves = knightMoves(pos, Board)
         tmpX = x - 2;
         if(tmpX > 0 && sign(Board(tmpX, tmpY)) ~= team)
             idx = idx + 1;
-            moves(idx) = sub2ind([8 8], tmpX, tmpY);
+            moves(idx) = sub2ind(tmpX, tmpY);
         end
         tmpX = x + 2;
         if(tmpX < 9 && sign(Board(tmpX, tmpY)) ~= team)
             idx = idx + 1;
-            moves(idx) = sub2ind([8 8], tmpX, tmpY);
+            moves(idx) = sub2ind(tmpX, tmpY);
         end
     end
     moves = moves(1:idx); % shrink array to number of valid moves

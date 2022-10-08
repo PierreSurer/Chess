@@ -41,10 +41,10 @@ function [startPos, endPos] = playAIMove(previousMoves, team, Board)
     if size(previousMoves, 1) < 8
         [success, startPos, endPos] = computeOpening(Board, previousMoves);
         if ~success
-            [startPos, endPos] = computeAI(7, team, -1E7, +1E7, Board);
+            [startPos, endPos] = computeAI(5, team, -1E7, +1E7, Board);
         end
     else
-        [startPos, endPos] = computeAI(7, team, -1E7, +1E7, Board);
+        [startPos, endPos] = computeAI(5, team, -1E7, +1E7, Board);
     end
     % reset memoization of board values
     memo = Memoize;
@@ -196,7 +196,7 @@ end
 % draw a circle at pos. (possible moves for a selected piece)
 function h = drawPoint(pos, tileWidth, side)
     hold on
-    [x, y] = ind2sub([8 8], pos);
+    [x, y] = ind2sub(pos);
     if(side == 1)
         y = 9 - y;
     end
@@ -210,7 +210,7 @@ end
 % draw a target at pos. (adversary pieces to take)
 function h = drawTarget(pos, tileWidth, side)
     hold on
-    [x, y] = ind2sub([8 8], pos);
+    [x, y] = ind2sub(pos);
     if(side == 1)
         y = 9 - y;
     end
@@ -226,7 +226,7 @@ end
 % draw a selection at pos. (selected piece before moving)
 function h = drawSelectedPiece(pos, tileWidth, side)
     hold on
-    [x, y] = ind2sub([8 8], pos);
+    [x, y] = ind2sub(pos);
     if(side == 1)
         y = 9 - y;
     end
@@ -246,6 +246,6 @@ function pos = userInput(side)
     if(side == 1)
         y = 9 - y;
     end
-    pos = sub2ind([8 8], x, y);
+    pos = sub2ind(x, y);
 end
   

@@ -4,8 +4,8 @@ function [PostBoard] = playMove(startPos, endPos, Board)
     PostBoard = Board;
     PostBoard(endPos) = Board(startPos);
     PostBoard(startPos) = 0;
-    [startX, startY] = ind2sub([8 8], startPos);
-    [endX, endY] = ind2sub([8 8], endPos);
+    [startX, startY] = ind2sub(startPos);
+    [endX, endY] = ind2sub(endPos);
     
     % set values for en passant
     if(abs(PostBoard(endPos)) == 6 || abs(PostBoard(endPos)) == 9)
