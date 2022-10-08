@@ -2,7 +2,7 @@
 function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
     % first, check if this path was already explored in a recursive call.
     memo = Memoize;
-    if false && depth > 2 && memo.contains(Board)
+    if depth > 2 && memo.contains(Board)
         [startPos, endPos, val] = memo.lookup(Board);
         return;
 
@@ -55,7 +55,7 @@ function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
     end
     
     % memoize this board result
-    if false && depth > 2
+    if depth > 2
         memo.insert(Board, [startPos, endPos, val]);
     end
 end
