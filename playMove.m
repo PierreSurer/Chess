@@ -1,11 +1,11 @@
-function [PostBoard] = playMove(startPos, endPos, Board)
+function PostBoard = playMove(startPos, endPos, Board)
     team = sign(Board(startPos));
     Board(Board == team * 9) = team * 6; % disable en passant for current team
     PostBoard = Board;
     PostBoard(endPos) = Board(startPos);
     PostBoard(startPos) = 0;
-    [startX, startY] = ind2sub(startPos);
-    [endX, endY] = ind2sub(endPos);
+    [startX, startY] = myind2sub(startPos);
+    [endX, endY] = myind2sub(endPos);
     
     % set values for en passant
     if(abs(PostBoard(endPos)) == 6 || abs(PostBoard(endPos)) == 9)

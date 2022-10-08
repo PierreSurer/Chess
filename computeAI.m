@@ -11,12 +11,13 @@ function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
         endPos = -1;
         val = evaluate(team, Board);
 
-    elseif(isKingChessed(-team, Board)) % still chessed -> remove
+    elseif(isKingChessed(-team, Board)) % still chessed -> forbidden move
         startPos = -1;
         endPos = -1;
         val = +1E7;
 
     else % intermediate node
+        % get list of possible moves
         pieces = find(sign(Board) == team);
         possibleMoves = zeros(0, 2); % pairs of startPos, endPos
         for i = 1:size(pieces, 1)
@@ -24,9 +25,11 @@ function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
             moves2 = [repmat(pieces(i), size(moves, 1), 1) moves]; % add startPos column
             possibleMoves = cat(1, possibleMoves, moves2);
         end
-        taken = abs(Board(possibleMoves(:, 2)));
-        taken = arrayfun(@(p) getVal(p), taken);
+        
+        % explore the nodes in order of pieces taken
+        taken = getPieceVal(abs(Board(possibleMoves(:, 2))));
         [~, idx] = sort(taken, 'descend');
+
         val = -1E6; % 1E6 < 1E7
         for move = 1:size(possibleMoves)
             thisStartPos = possibleMoves(idx(move), 1);
@@ -43,6 +46,7 @@ function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
             end
             alpha = max(alpha, val);
         end
+        
         if(val == -1E6) % pat
             startPos = -1;
             endPos = -1;
@@ -56,7 +60,7 @@ function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
     end
 end
 
-function [val] = getVal(piece)
+function [val] = getPieceVal(piece)
     values = [0, 8, 7, 5, 4, 6, 3, 8, 7, 3];
     val = values(piece + 1);
 end

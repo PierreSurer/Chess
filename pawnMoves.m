@@ -2,26 +2,26 @@ function moves = pawnMoves(pos, Board)
     moves = zeros(4, 1, 'int8');
     idx = 0;
     team = sign(Board(pos));
-    [x, y] = ind2sub(pos);
+    [x, y] = myind2sub(pos);
     tmpY = y + team;
 
     % normal forward move
     if(Board(x, tmpY) == 0)
         idx = idx + 1;
-        moves(idx) = sub2ind(x, tmpY);
+        moves(idx) = mysub2ind(x, tmpY);
     end
 
     % double forward move (white)
     if(y == 2 && sign(Board(x, 2)) == 1) 
         if(Board(x, 3) == 0 && Board(x, 4) == 0)
             idx = idx + 1;
-            moves(idx) = sub2ind(x, 4);
+            moves(idx) = mysub2ind(x, 4);
         end
         % double forward move (black)
     elseif(y == 7 && sign(Board(x, 7)) == -1) 
         if(Board(x, 6) == 0 && Board(x, 5) == 0)
             idx = idx + 1;
-            moves(idx) = sub2ind(x, 5);
+            moves(idx) = mysub2ind(x, 5);
         end
     end
 
@@ -30,12 +30,12 @@ function moves = pawnMoves(pos, Board)
         % diagonal attack move
         if(sign(Board(tmpX, tmpY)) == -team)
             idx = idx + 1;
-            moves(idx) = sub2ind(tmpX, tmpY);
+            moves(idx) = mysub2ind(tmpX, tmpY);
         else
             % en passant
             if(Board(tmpX, y) == -team * 9 && Board(tmpX, tmpY) == 0)
                 idx = idx + 1;
-                moves(idx) = sub2ind(tmpX, tmpY);
+                moves(idx) = mysub2ind(tmpX, tmpY);
             end
         end
     end
@@ -44,12 +44,12 @@ function moves = pawnMoves(pos, Board)
         % diagonal attack move
         if(sign(Board(tmpX, tmpY)) == -team)
             idx = idx + 1;
-            moves(idx) = sub2ind(tmpX, tmpY);
+            moves(idx) = mysub2ind(tmpX, tmpY);
         else
             % en passant
             if(Board(tmpX, y) == -team * 9 && Board(tmpX, tmpY) == 0)
                 idx = idx + 1;
-                moves(idx) = sub2ind(tmpX, tmpY);
+                moves(idx) = mysub2ind(tmpX, tmpY);
             end
         end
     end

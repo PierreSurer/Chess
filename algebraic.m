@@ -8,7 +8,7 @@ classdef algebraic
             % find endPos (easiest)
             endX = str(end - 1) - 'a' + 1;
             endY = str(end - 0) - '1' + 1;
-            endPos = sub2ind(endX, endY);
+            endPos = mysub2ind(endX, endY);
 
             % find piece type
             type = strfind('KQBNR', str(1));
@@ -30,7 +30,7 @@ classdef algebraic
             elseif size(pieces, 1) == 1
                 startPos = pieces(1);
             else % multiple candidate pieces: desambiguate with file, then rank, then file&rank
-                [x, y] = ind2sub(pieces);
+                [x, y] = myind2sub(pieces);
                 file = str(1) - 'a' + 1;
                 if file < 1 || file > 8
                     rank = str(1) - '1' + 1;
@@ -62,7 +62,7 @@ classdef algebraic
             end
         
             % destination
-            [endX, endY] = ind2sub(endPos);
+            [endX, endY] = myind2sub(endPos);
             endFile = 'a' + (endX - 1);
             endRank = '1' + (endY - 1);
         
@@ -88,13 +88,13 @@ classdef algebraic
             startRank = '';
         
             if size(pieces, 1) > 0
-                [x, y] = ind2sub(pieces);
-                [startX, startY] = ind2sub(startPos);
-                if any(x == startX)
-                    startFile = 'a' + (startX - 1);
-                end
-                if any(y == startY)
+                [x, y] = myind2sub(pieces);
+                [startX, startY] = myind2sub(startPos);
+                if any(x == startX) % same file, desambiguate with rank
                     startRank = '1' + (startY - 1);
+                end
+                if any(y == startY) % same rank, desambiguate with file
+                    startFile = 'a' + (startX - 1);
                 end
             end
         

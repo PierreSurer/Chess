@@ -4,6 +4,7 @@ previousMoves = cell(0);
 
 team = 1; % team: 1=white, -1=black
 humanPlayers = [false, false]; % white, black players are either AI or human player
+depth = 5; % AI search depth (number of moves)
 
 while(true)
     if team == 1 && humanPlayers(1) || team == -1 && humanPlayers(2)
@@ -12,12 +13,12 @@ while(true)
     else
         fprintf('Team %s played by AI - ', teamName(team));
         tic;
-        [startPos, endPos] = playAIMove(previousMoves, team, Board);
+        [startPos, endPos] = playAIMove(depth, previousMoves, team, Board);
         toc;
     end
     previousMoves(end + 1, :) = { algebraic.stringify(startPos, endPos, team, Board) };
 
-    [Board] = playMove(startPos, endPos, Board);
+    Board = playMove(startPos, endPos, Board);
     if(team == 1 && humanPlayers(2) || not(humanPlayers(1)) && humanPlayers(2))
         displayBoard(Board, -1);
     else
@@ -34,21 +35,55 @@ while(true)
     else
         team = -team;
     end
-    
 end
 
-function [startPos, endPos] = playAIMove(previousMoves, team, Board)
+function [startPos, endPos] = playAIMove(depth, previousMoves, team, Board)
     if size(previousMoves, 1) < 8
         [success, startPos, endPos] = computeOpening(Board, previousMoves);
         if ~success
-            [startPos, endPos] = computeAI(5, team, -1E7, +1E7, Board);
+            [startPos, endPos] = computeAI(depth, team, -1E7, +1E7, Board);
         end
     else
-        [startPos, endPos] = computeAI(5, team, -1E7, +1E7, Board);
+        % debugAI(depth, team, Board);
+        [startPos, endPos] = computeAI(depth, team, -1E7, +1E7, Board);
     end
     % reset memoization of board values
     memo = Memoize;
     memo.reset;
+end
+
+% function to show what moves the AI sees after minmax tree exploration.
+function [] = debugAI(depth, team, Board)
+    fprintf("Debug AI vision:\n");
+    askAlt = true;
+    for d = depth:-1:1
+        before = evaluate(team, Board);
+        [startPos, endPos, after] = computeAI(d, team, -1E7, +1E7, Board);
+        str = algebraic.stringify(startPos, endPos, team, Board);
+        fprintf("AI %s wants to play %s, before=%f, after=%f\n", teamName(team), str, before, after);
+        if askAlt
+            str = input("prompt> ", "s");
+            if str == 'n'
+                fprintf("continuing\n");
+            elseif str == 'a'
+                disp(Board);
+                while true
+                    str = input("play alternative: ", "s");
+                    try
+                        [startPos, endPos] = algebraic.parse(str, team, Board);
+                        break;
+                    catch
+                        fprintf("failed to parse algebraic\n");
+                    end
+                end
+            else
+                askAlt = false;
+            end
+        end
+        Board = playMove(startPos, endPos, Board);
+        team = -team;
+    end
+    fprintf("----\n");
 end
 
 function [startPos, endPos] = playUserMove(team, Board)
@@ -196,7 +231,7 @@ end
 % draw a circle at pos. (possible moves for a selected piece)
 function h = drawPoint(pos, tileWidth, side)
     hold on
-    [x, y] = ind2sub(pos);
+    [x, y] = myind2sub(pos);
     if(side == 1)
         y = 9 - y;
     end
@@ -210,7 +245,7 @@ end
 % draw a target at pos. (adversary pieces to take)
 function h = drawTarget(pos, tileWidth, side)
     hold on
-    [x, y] = ind2sub(pos);
+    [x, y] = myind2sub(pos);
     if(side == 1)
         y = 9 - y;
     end
@@ -226,7 +261,7 @@ end
 % draw a selection at pos. (selected piece before moving)
 function h = drawSelectedPiece(pos, tileWidth, side)
     hold on
-    [x, y] = ind2sub(pos);
+    [x, y] = myind2sub(pos);
     if(side == 1)
         y = 9 - y;
     end
@@ -246,6 +281,6 @@ function pos = userInput(side)
     if(side == 1)
         y = 9 - y;
     end
-    pos = sub2ind(x, y);
+    pos = mysub2ind(x, y);
 end
   
