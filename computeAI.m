@@ -25,6 +25,9 @@ function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
             moves2 = [repmat(pieces(i), size(moves, 1), 1) moves]; % add startPos column
             possibleMoves = cat(1, possibleMoves, moves2);
         end
+
+        % shuffle possibleMoves to allow variations in case of equal values
+        possibleMoves = possibleMoves(randperm(size(possibleMoves, 1)), :);
         
         % explore the nodes in order of pieces taken
         taken = getPieceVal(abs(Board(possibleMoves(:, 2))));
