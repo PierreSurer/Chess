@@ -2,20 +2,20 @@
 function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
     % first, check if this path was already explored in a recursive call.
     memo = Memoize;
-    if depth > 2 && memo.contains(Board)
+    if false && depth > 2 && memo.contains(Board)
         [startPos, endPos, val] = memo.lookup(Board);
         return;
+
+    elseif(depth == 0) % leaf node
+        startPos = -1;
+        endPos = -1;
+        val = evaluate(team, Board);
 
     elseif(isKingChessed(-team, Board)) % still chessed -> remove
         startPos = -1;
         endPos = -1;
         val = +1E7;
 
-    elseif(depth == 0) % leaf node
-        startPos = -1;
-        endPos = -1;
-        val = evaluate(team, Board);
-        
     else % intermediate node
         pieces = find(sign(Board) == team);
         possibleMoves = zeros(0, 2); % pairs of startPos, endPos
@@ -25,7 +25,7 @@ function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
             possibleMoves = cat(1, possibleMoves, moves2);
         end
         taken = abs(Board(possibleMoves(:, 2)));
-        taken = arrayfun(@(a) getVal(a + 1), taken);
+        taken = arrayfun(@(p) getVal(p), taken);
         [~, idx] = sort(taken, 'descend');
         val = -1E6; % 1E6 < 1E7
         for move = 1:size(possibleMoves)
@@ -51,12 +51,12 @@ function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
     end
     
     % memoize this board result
-    if depth > 2
+    if false && depth > 2
         memo.insert(Board, [startPos, endPos, val]);
     end
 end
 
 function [val] = getVal(piece)
     values = [0, 8, 7, 5, 4, 6, 3, 8, 7, 3];
-    val = values(piece);
+    val = values(piece + 1);
 end
