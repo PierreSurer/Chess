@@ -3,7 +3,7 @@ displayBoard(Board, 1);
 previousMoves = cell(0);
 
 team = 1; % team: 1=white, -1=black
-humanPlayers = [false, false]; % white, black players are either AI or human player
+humanPlayers = [true, false]; % white, black players are either AI or human player
 depth = 6; % AI search depth (number of moves)
 rng(1); % seed for the rng: comment for non-predictible outputs
 
@@ -39,18 +39,26 @@ while(true)
 end
 
 function [startPos, endPos] = playAIMove(depth, previousMoves, team, Board)
+    % reset memoization of board values
+    memo = Memoize;
+    memo.reset;
+    debugAI(depth, team, Board);
     if size(previousMoves, 1) < 8
         [success, startPos, endPos] = computeOpening(Board, previousMoves);
         if ~success
             [startPos, endPos] = computeAI(depth, team, -1E7, +1E7, Board);
         end
     else
-        % debugAI(depth, team, Board);
         [startPos, endPos] = computeAI(depth, team, -1E7, +1E7, Board);
     end
     % reset memoization of board values
     memo = Memoize;
     memo.reset;
+
+    if startPos < 0 || endPos < 0
+        disp([startPos, endPos]);
+        throw("unexpected error");
+    end
 end
 
 % function to show what moves the AI sees after minmax tree exploration.
@@ -144,30 +152,39 @@ function [Board] = createBoard()
     % 8 : moved_rook
     % 9 : pawn_en_passant
 
-    for i = 1:8
-        Board(i,2) = 6;
-        Board(i,7) = -6;
-    end
-    
-    Board(1,1) = 5;
-    Board(8,1) = 5;
-    Board(1,8) = -5;
-    Board(8,8) = -5;
-    
-    Board(2,1) = 4;
-    Board(7,1) = 4;
-    Board(2,8) = -4;
-    Board(7,8) = -4;
-    
-    Board(3,1) = 3;
-    Board(6,1) = 3;
-    Board(3,8) = -3;
-    Board(6,8) = -3;
-    
-    Board(4,1) = 2;
-    Board(5,1) = 1;
-    Board(4,8) = -2;
-    Board(5,8) = -1;
+      Board(7, 1) = 7;
+      Board(5, 8) = -7;
+      Board(3, 7) = 8;
+      Board(4, 6) = 8;
+
+      Board(8, 6) = -4;
+%       Board(8, 5) = -6;
+%       Board(7, 5) = -6;
+
+%     for i = 1:8
+%         Board(i,2) = 6;
+%         Board(i,7) = -6;
+%     end
+%     
+%     Board(1,1) = 5;
+%     Board(8,1) = 5;
+%     Board(1,8) = -5;
+%     Board(8,8) = -5;
+%     
+%     Board(2,1) = 4;
+%     Board(7,1) = 4;
+%     Board(2,8) = -4;
+%     Board(7,8) = -4;
+%     
+%     Board(3,1) = 3;
+%     Board(6,1) = 3;
+%     Board(3,8) = -3;
+%     Board(6,8) = -3;
+%     
+%     Board(4,1) = 2;
+%     Board(5,1) = 1;
+%     Board(4,8) = -2;
+%     Board(5,8) = -1;
 
 end
 
@@ -232,7 +249,7 @@ end
 % draw a circle at pos. (possible moves for a selected piece)
 function h = drawPoint(pos, tileWidth, side)
     hold on
-    [x, y] = myind2sub(pos);
+    [x, y] = ind2sub([8 8], pos);
     if(side == 1)
         y = 9 - y;
     end
@@ -246,7 +263,7 @@ end
 % draw a target at pos. (adversary pieces to take)
 function h = drawTarget(pos, tileWidth, side)
     hold on
-    [x, y] = myind2sub(pos);
+    [x, y] = ind2sub([8 8], pos);
     if(side == 1)
         y = 9 - y;
     end
@@ -262,7 +279,7 @@ end
 % draw a selection at pos. (selected piece before moving)
 function h = drawSelectedPiece(pos, tileWidth, side)
     hold on
-    [x, y] = myind2sub(pos);
+    [x, y] = ind2sub([8 8], pos);
     if(side == 1)
         y = 9 - y;
     end

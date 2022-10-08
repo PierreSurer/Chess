@@ -10,6 +10,10 @@ function [success, startPos, endPos] = computeOpening(Board, previousMoves)
     
     table = T;
 
+    startPos = -1;
+    endPos = -1;
+    success = true;
+
     % filter table by previousMoves
     for i = 1:size(previousMoves, 1)
         move = moveName(i);
@@ -18,17 +22,23 @@ function [success, startPos, endPos] = computeOpening(Board, previousMoves)
     end
 
     if size(table, 1) == 0
-        startPos = -1;
-        endPos = -1;
         success = false;
         return;
-    else
-       success = true;
     end
-   
+    
     move = moveName(size(previousMoves, 1) + 1);
     team = 1 - mod(size(previousMoves, 1), 2) * 2;
+
+    % remove rows without the next move
+    table = rmmissing(table, 'DataVariables', move);
+    if isempty(table)
+        success = false;
+        return;
+    end
+
     moveScores = groupsummary(table, move, 'sum', 'perc_player_win');
+    
+
     [~, best] = max(moveScores{:, 3}, [], 1);
     best = moveScores(best, 1);
     best = char(best{1, move});
