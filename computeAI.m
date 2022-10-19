@@ -33,13 +33,13 @@ function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
         taken = getPieceVal(abs(Board(possibleMoves(:, 2))));
         [~, idx] = sort(taken, 'descend');
 
-        val = -depth * 1E5;
+        val = -depth * 1E6;
         for move = 1:size(possibleMoves)
             thisStartPos = possibleMoves(idx(move), 1);
             thisEndPos = possibleMoves(idx(move), 2);
             [nextBoard] = playMove(thisStartPos, thisEndPos, Board);
             [~, ~, thisVal] = computeAI(depth - 1, -team, -beta, -alpha, nextBoard);
-            if(-thisVal >= val)
+            if(-thisVal > val)
                 startPos = thisStartPos;
                 endPos = thisEndPos;
                 val = -thisVal;
@@ -51,9 +51,14 @@ function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
         end
         
         if val == -depth * 1E5 % pat: best next move is chess, or no next move
-            startPos = -3;
-            endPos = -3;
-            val = evaluate(team, Board);
+            if(isKingChessed(team, Board))
+                startPos = -3;
+                endPos = -3;
+            else
+                startPos = -4;
+                endPos = -4;
+                val = evaluate(team, Board);
+            end
         end
     end
     
