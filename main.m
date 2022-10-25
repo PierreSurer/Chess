@@ -4,8 +4,8 @@ previousMoves = cell(0);
 
 team = 1; % team: 1=white, -1=black
 humanPlayers = [false, false]; % white, black players are either AI or human player
-depth = 3; % AI search depth (number of moves)
-rng(1); % seed for the rng: comment for non-predictible outputs
+depth = 6; % AI search depth (number of moves)
+rng('shuffle'); % seed for the rng: comment for non-predictible outputs
 
 while(true)
     if team == 1 && humanPlayers(1) || team == -1 && humanPlayers(2)
