@@ -1,12 +1,29 @@
 % compute the next move of the AI.
 function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
+    hasDictionnary = true; % enable if matlab version supports dictionnaries
+
+    % https://en.wikipedia.org/wiki/Negamax
+    alphaOrig = alpha;
+
     % first, check if this path was already explored in a recursive call.
     memo = Memoize;
-    if false && depth > 2 && memo.contains(Board)
-        [startPos, endPos, val] = memo.lookup(Board);
-        return;
+    if hasDictionnary && memo.contains({team, Board})
+        [startPos, endPos, val, dictDepth, flag] = memo.lookup({team, Board});
+        if dictDepth >= depth % Check if dictionnary is useful
+            if flag == 0
+                return;
+            elseif flag == -1
+                alpha = max(alpha, val);
+            elseif flag == 1
+                beta = min(beta, val);
+            end
+        end
+        if alpha >= beta
+            return;
+        end
+    end
 
-    elseif(isKingChessed(-team, Board)) % still chessed -> forbidden move
+    if(isKingChessed(-team, Board)) % still chessed -> forbidden move
         startPos = -1;
         endPos = -1;
         val = (depth + 1) * 1E5; % reward more if mat quickly
@@ -59,13 +76,19 @@ function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
                 endPos = -4;
                 val = evaluate(team, Board);
             end
+            % memoize this board result
+        elseif hasDictionnary && depth > 2
+            if val <= alphaOrig
+                flag = 1;
+            elseif val >= beta
+                flag = -1;
+            else
+                flag = 0;
+            end
+            memo.insert({team, Board}, [startPos, endPos, val, depth, flag]);
         end
     end
     
-    % memoize this board result
-    if false && depth > 2
-        memo.insert(Board, [startPos, endPos, val]);
-    end
 end
 
 function [val] = getPieceVal(piece)

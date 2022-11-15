@@ -5,15 +5,47 @@ classdef algebraic
    methods (Static)
 
        function [startPos, endPos] = parse(str, team, Board)
+            str = erase(str,['+']);
+            Board(Board == team * 9) = team * 6;
+            Board(Board == team * 7) = team * 1;
+            Board(Board == team * 8) = team * 5;
+
+
             % find endPos (easiest)
             endX = str(end - 1) - 'a' + 1;
             endY = str(end - 0) - '1' + 1;
             endPos = mysub2ind(endX, endY);
+            
+            % kingside castling
+            if str == "O-O"
+                if team == 1
+                    startPos = mysub2ind(5, 1);
+                    endPos = mysub2ind(7, 1);
+                else
+                    startPos = mysub2ind(5, 8);
+                    endPos = mysub2ind(7, 8);
+                end
+                return;
+            end
+            
+            % queenside castling
+            if str == "O-O-O"
+                if team == 1
+                    startPos = mysub2ind(5, 1);
+                    endPos = mysub2ind(3, 1);
+                else
+                    startPos = mysub2ind(5, 8);
+                    endPos = mysub2ind(3, 8);
+                end
+                return;
+            end
 
             % find piece type
             type = strfind('KQBNR', str(1));
             if isempty(type)
                 type = 6;
+            else
+                str = str(2:end); %clear piece type
             end
         
             % find pieces of the right type that can go to endPos
@@ -53,6 +85,18 @@ classdef algebraic
         function str = stringify(startPos, endPos, team, Board)
             startPiece = abs(Board(startPos));
             endPiece = abs(Board(endPos));
+
+            % kingside castling
+            if (startPos == mysub2ind(5, 1) && endPos == mysub2ind(7, 1) || startPos == mysub2ind(5, 8) && endPos == mysub2ind(7, 8)) && startPiece == 1
+                str = "O-O";
+                return;
+            end
+            
+            % queenside castling
+            if (startPos == mysub2ind(5, 1) && endPos == mysub2ind(3, 1) || startPos == mysub2ind(5, 8) && endPos == mysub2ind(3, 8)) && startPiece == 1
+                str = "O-O-O";
+                return;
+            end
         
             % piece name
             names = 'KQBNR_KR_';

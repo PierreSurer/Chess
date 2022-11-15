@@ -3,20 +3,22 @@ classdef Memoize
         Data = MemoizeStore
     end
     methods
-        function [] = insert(obj, Board, val)
-            obj.Data.Data(keyHash(Board)) = val;
+        function [] = insert(obj, cell, val)
+            obj.Data.Data(keyHash(cell)) = val;
             % disp(length(obj.Data.Data));
         end
 
-        function [startPos, endPos, val] = lookup(obj, Board)
-            d = obj.Data.Data(keyHash(Board));
+        function [startPos, endPos, val, depth, flag] = lookup(obj, cell)
+            d = obj.Data.Data(keyHash(cell));
             startPos = d(1);
             endPos = d(2);
             val = d(3);
+            depth = d(4);
+            flag = d(5);
         end
 
-        function res = contains(obj, Board)
-            res = isKey(obj.Data.Data, keyHash(Board));
+        function res = contains(obj, cell)
+            res = isKey(obj.Data.Data, keyHash(cell));
         end
 
         function [] = reset(obj)

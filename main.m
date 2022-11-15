@@ -4,17 +4,19 @@ previousMoves = cell(0);
 
 team = 1; % team: 1=white, -1=black
 humanPlayers = [false, false]; % white, black players are either AI or human player
-depth = 6; % AI search depth (number of moves)
+depth = 2; % AI search depth (number of moves)
 rng('shuffle'); % seed for the rng: comment for non-predictible outputs
 
 while(true)
     if team == 1 && humanPlayers(1) || team == -1 && humanPlayers(2)
-        fprintf('Team %s played by human\n', teamName(team));
+        fprintf('Team %s played by human - ', teamName(team));
         [startPos, endPos] = playUserMove(team, Board);
+        fprintf('%s\n', algebraic.stringify(startPos, endPos, team, Board));
     else
         fprintf('Team %s played by AI - ', teamName(team));
         tic;
         [startPos, endPos] = playAIMove(depth, previousMoves, team, Board);
+        fprintf('%s - ', algebraic.stringify(startPos, endPos, team, Board));
         toc;
     end
     previousMoves(end + 1, :) = { algebraic.stringify(startPos, endPos, team, Board) };
@@ -46,14 +48,14 @@ function [startPos, endPos] = playAIMove(depth, previousMoves, team, Board)
     if size(previousMoves, 1) < 8
         [success, startPos, endPos] = computeOpening(Board, previousMoves);
         if ~success
-            [startPos, endPos] = computeAI(depth, team, -1E7, +1E7, Board);
+            [startPos, endPos] = computeAI(depth, team, -1E8, +1E8, Board);
         end
     else
-        [startPos, endPos] = computeAI(depth, team, -1E7, +1E7, Board);
+        [startPos, endPos] = computeAI(depth, team, -1E8, +1E8, Board);
     end
     % reset memoization of board values
     memo = Memoize;
-    memo.reset;
+    %memo.reset;
 
     if startPos < 0 || endPos < 0
         disp([startPos, endPos]);
@@ -152,6 +154,7 @@ function [Board] = createBoard()
     % 8 : moved_rook
     % 9 : pawn_en_passant
 
+    
     for i = 1:8
         Board(i,2) = 6;
         Board(i,7) = -6;
@@ -176,7 +179,13 @@ function [Board] = createBoard()
     Board(5,1) = 1;
     Board(4,8) = -2;
     Board(5,8) = -1;
-
+    %{
+    Board(4,1) = 7;
+    Board(6,1) = -7;
+    Board(2,3) = 6;
+    Board(3,6) = 3;
+    Board(8,7) = 8;
+    %}
 end
 
 function im = getPieceImage(im, index)

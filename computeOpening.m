@@ -36,9 +36,11 @@ function [success, startPos, endPos] = computeOpening(Board, previousMoves)
         return;
     end
 
-    moveScores = groupsummary(table, move, 'mean', 'perc_player_win');
-    idx = floor(rand(1) * height(moveScores)) + 1;
-    
+    moveScores = groupsummary(table, move, 'sum', 'num_games');
+    scores = moveScores.sum_num_games(:,1);
+    scores = scores / max(scores);
+    idx = randsample(1:height(scores), 1, true, scores);
+
     best = moveScores(idx, 1);
     best = char(best{1, move});
     [startPos, endPos] = algebraic.parse(best, team, Board);
