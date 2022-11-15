@@ -1,6 +1,12 @@
 % compute the next move of the AI.
 function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
-    hasDictionnary = true; % enable if matlab version supports dictionnaries
+    hasDictionnary = false; % enable if matlab version supports dictionnaries
+    if(isKingChessed(-team, Board)) % still chessed -> forbidden move
+        startPos = -1;
+        endPos = -1;
+        val = (depth + 1) * 1E5; % reward more if mat quickly
+        return;
+    end
 
     % https://en.wikipedia.org/wiki/Negamax
     alphaOrig = alpha;
@@ -21,13 +27,7 @@ function [startPos, endPos, val] = computeAI(depth, team, alpha, beta, Board)
         if alpha >= beta
             return;
         end
-    end
-
-    if(isKingChessed(-team, Board)) % still chessed -> forbidden move
-        startPos = -1;
-        endPos = -1;
-        val = (depth + 1) * 1E5; % reward more if mat quickly
-
+       
     elseif(depth == 0) % leaf node
         startPos = -2;
         endPos = -2;

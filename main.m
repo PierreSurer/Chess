@@ -1,3 +1,5 @@
+HeatMap; %init heatmap
+
 Board = createBoard();
 displayBoard(Board, 1);
 previousMoves = cell(0);
@@ -13,11 +15,8 @@ while(true)
         [startPos, endPos] = playUserMove(team, Board);
         fprintf('%s\n', algebraic.stringify(startPos, endPos, team, Board));
     else
-        fprintf('Team %s played by AI - ', teamName(team));
-        tic;
+        fprintf('Team %s played by AI ', teamName(team));
         [startPos, endPos] = playAIMove(depth, previousMoves, team, Board);
-        fprintf('%s - ', algebraic.stringify(startPos, endPos, team, Board));
-        toc;
     end
     previousMoves(end + 1, :) = { algebraic.stringify(startPos, endPos, team, Board) };
 
@@ -41,21 +40,53 @@ while(true)
 end
 
 function [startPos, endPos] = playAIMove(depth, previousMoves, team, Board)
+    persistent lastTimeElapsed;
+    persistent newDepth;
+    if isempty(lastTimeElapsed) || isempty(newDepth)
+        lastTimeElapsed = [];
+        newDepth = depth;
+    end
     % reset memoization of board values
     memo = Memoize;
     memo.reset;
     %debugAI(depth, team, Board);
     if size(previousMoves, 1) < 8
+        tStart = tic;
         [success, startPos, endPos] = computeOpening(Board, previousMoves);
+        tEnd = toc(tStart);
         if ~success
+            fprintf('depth %d - ', depth);
+            tStart = tic;
             [startPos, endPos] = computeAI(depth, team, -1E8, +1E8, Board);
+            tEnd = toc(tStart);
+            lastTimeElapsed(end + 1, :) = tEnd;
+            fprintf('%s - ', algebraic.stringify(startPos, endPos, team, Board));
+            fprintf('Played in %f s\n', tEnd);
+        else
+            fprintf('depth 0 - %s - ', algebraic.stringify(startPos, endPos, team, Board));
+            fprintf('Played in %f s\n', tEnd);
         end
     else
-        [startPos, endPos] = computeAI(depth, team, -1E8, +1E8, Board);
+        if(size(lastTimeElapsed, 1) >= 3)
+            val = sum(lastTimeElapsed(end-2:end));
+            if val < 18.0 
+                newDepth = newDepth + 1;
+            elseif val > 250.0 
+                newDepth = newDepth - 1;
+                lastTimeElapsed = lastTimeElapsed(end-1:end);
+            end
+        end
+        fprintf('depth %d - ', max(depth, newDepth));
+        tStart = tic;
+        [startPos, endPos] = computeAI(max(depth, newDepth), team, -1E8, +1E8, Board);
+        tEnd = toc(tStart);
+        lastTimeElapsed(end + 1, :) = tEnd;
+        fprintf('%s - ', algebraic.stringify(startPos, endPos, team, Board));
+        fprintf('Played in %f s\n', tEnd);
     end
     % reset memoization of board values
     memo = Memoize;
-    %memo.reset;
+    memo.reset;
 
     if startPos < 0 || endPos < 0
         disp([startPos, endPos]);

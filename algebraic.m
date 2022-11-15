@@ -88,13 +88,13 @@ classdef algebraic
 
             % kingside castling
             if (startPos == mysub2ind(5, 1) && endPos == mysub2ind(7, 1) || startPos == mysub2ind(5, 8) && endPos == mysub2ind(7, 8)) && startPiece == 1
-                str = "O-O";
+                str = 'O-O';
                 return;
             end
             
             % queenside castling
             if (startPos == mysub2ind(5, 1) && endPos == mysub2ind(3, 1) || startPos == mysub2ind(5, 8) && endPos == mysub2ind(3, 8)) && startPiece == 1
-                str = "O-O-O";
+                str = 'O-O-O';
                 return;
             end
         
