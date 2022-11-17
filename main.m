@@ -5,7 +5,7 @@ displayBoard(Board, 1);
 previousMoves = cell(0);
 
 team = 1; % team: 1=white, -1=black
-humanPlayers = [false, false]; % white, black players are either AI or human player
+humanPlayers = [true, true]; % white, black players are either AI or human player
 depth = 2; % AI search depth (number of moves)
 rng('shuffle'); % seed for the rng: comment for non-predictible outputs
 
@@ -42,10 +42,6 @@ end
 function [startPos, endPos] = playAIMove(depth, previousMoves, team, Board)
     persistent lastTimeElapsed;
     persistent newDepth;
-    if isempty(lastTimeElapsed) || isempty(newDepth)
-        lastTimeElapsed = [];
-        newDepth = depth;
-    end
     % reset memoization of board values
     memo = Memoize;
     memo.reset;
@@ -65,6 +61,8 @@ function [startPos, endPos] = playAIMove(depth, previousMoves, team, Board)
         else
             fprintf('depth 0 - %s - ', algebraic.stringify(startPos, endPos, team, Board));
             fprintf('Played in %f s\n', tEnd);
+            lastTimeElapsed = [];
+            newDepth = depth;
         end
     else
         if(size(lastTimeElapsed, 1) >= 3)
@@ -185,7 +183,6 @@ function [Board] = createBoard()
     % 8 : moved_rook
     % 9 : pawn_en_passant
 
-    
     for i = 1:8
         Board(i,2) = 6;
         Board(i,7) = -6;
@@ -210,13 +207,7 @@ function [Board] = createBoard()
     Board(5,1) = 1;
     Board(4,8) = -2;
     Board(5,8) = -1;
-    %{
-    Board(4,1) = 7;
-    Board(6,1) = -7;
-    Board(2,3) = 6;
-    Board(3,6) = 3;
-    Board(8,7) = 8;
-    %}
+
 end
 
 function im = getPieceImage(im, index)
@@ -240,6 +231,8 @@ function [] = displayBoard(Board, side)
     Board = Board.';
     if(side == 1)
         Board = flip(Board, 1);
+    else
+        Board = flip(Board, 2);
     end
     [im, ~, alpha] = imread('pieces.png');
     imgs = arrayfun(@(x) getPieceImage(im, x), Board, 'UniformOutput', false);
@@ -247,11 +240,7 @@ function [] = displayBoard(Board, side)
     imgs = cell2mat(imgs);
     alphas = cell2mat(alphas);
     
-    if(side == 1)
-        tile = [240 217 181; 181 136 99; 181 136 99; 240 217 181] / 255;
-    else
-        tile = [181 136 99; 240 217 181; 240 217 181; 181 136 99] / 255;
-    end
+    tile = [240 217 181; 181 136 99; 181 136 99; 240 217 181] / 255;
     tile = reshape(tile, [2, 2, 3]);
     s = size(imgs);
     checker = repmat(tile, 4);
@@ -264,8 +253,8 @@ function [] = displayBoard(Board, side)
             text((8 - 0.03) * s(1) / 8, (i - 1.03) * s(1) / 8, string(9 - i), 'Color', colors(1 + mod(i + 1,2), :), 'FontSize', s(1) / 50 ,'VerticalAlignment', 'top', 'HorizontalAlignment', 'right');
             text((i - 0.97) * s(1) / 8, (8 - 0.03) * s(1) / 8, txt(i), 'Color', colors(1 + mod(i + 1,2), :), 'FontSize', s(1) / 50 , 'VerticalAlignment', 'baseline', 'HorizontalAlignment', 'left');
         else
-            text((8 - 0.03) * s(1) / 8, (i - 1.03) * s(1) / 8, string(i), 'Color', colors(1 + mod(i,2), :), 'FontSize', s(1) / 50 ,'VerticalAlignment', 'top', 'HorizontalAlignment', 'right');
-            text((i - 0.97) * s(1) / 8, (8 - 0.03) * s(1) / 8, txt(i), 'Color', colors(1 + mod(i,2), :), 'FontSize', s(1) / 50 , 'VerticalAlignment', 'baseline', 'HorizontalAlignment', 'left');
+            text((8 - 0.03) * s(1) / 8, (i - 1.03) * s(1) / 8, string(i), 'Color', colors(1 + mod(i + 1,2), :), 'FontSize', s(1) / 50 ,'VerticalAlignment', 'top', 'HorizontalAlignment', 'right');
+            text((i - 0.97) * s(1) / 8, (8 - 0.03) * s(1) / 8, txt(9 - i), 'Color', colors(1 + mod(i + 1,2), :), 'FontSize', s(1) / 50 , 'VerticalAlignment', 'baseline', 'HorizontalAlignment', 'left');
         end
         
     end
@@ -283,6 +272,8 @@ function h = drawPoint(pos, tileWidth, side)
     [x, y] = ind2sub([8 8], pos);
     if(side == 1)
         y = 9 - y;
+    else
+        x = 9 - x;
     end
     theta = 0:pi/50:2*pi;
     x = (x - 0.5 + cos(theta) * 0.15) * tileWidth;
@@ -297,6 +288,8 @@ function h = drawTarget(pos, tileWidth, side)
     [x, y] = ind2sub([8 8], pos);
     if(side == 1)
         y = 9 - y;
+    else
+        x = 9 - x;
     end
     theta = 0:pi/50:2*pi;
     xVals = [x * tileWidth, x * tileWidth, (x - 1) * tileWidth, (x - 1) * tileWidth, x * tileWidth, x * tileWidth];
@@ -313,6 +306,8 @@ function h = drawSelectedPiece(pos, tileWidth, side)
     [x, y] = ind2sub([8 8], pos);
     if(side == 1)
         y = 9 - y;
+    else
+        x = 9 - x;
     end
     xVals = [x * tileWidth, (x - 1) * tileWidth, (x - 1) * tileWidth, x * tileWidth];
     yVals = [(y - 1) * tileWidth, (y - 1) * tileWidth, y * tileWidth, y * tileWidth];
@@ -329,6 +324,8 @@ function pos = userInput(side)
     y = min(max(y, 1), 8);
     if(side == 1)
         y = 9 - y;
+    else
+        x = 9 - x;
     end
     pos = mysub2ind(x, y);
 end
