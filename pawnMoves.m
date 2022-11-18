@@ -1,3 +1,4 @@
+% lists all possible moves for a pawn
 function moves = pawnMoves(pos, Board)
     moves = zeros(4, 1, 'int8');
     idx = 0;

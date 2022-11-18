@@ -1,5 +1,7 @@
+% tests all chess possibilities
 function [result] = isKingChessed(team, Board)
     [x, y] = searchKing(team, Board);
+    % diagonals
     tmpX = x - 1;
     tmpY = y - 1;
     while(tmpX > 1 && tmpY > 1 && Board(tmpX, tmpY) == 0)
@@ -44,6 +46,7 @@ function [result] = isKingChessed(team, Board)
         return;
     end
     
+    % vertical / horizontal
     tmpX = x - 1;
     while(tmpX > 1 && Board(tmpX, y) == 0)
         tmpX = tmpX - 1;
@@ -80,7 +83,7 @@ function [result] = isKingChessed(team, Board)
         return;
     end
     
-    
+    % pawn
     if(y + team < 9 && y + team > 0)
         if(x + 1 < 9 && (Board(x + 1, y + team) == -team * 6 || Board(x + 1, y + team) == -team * 9))
             result = 1;
@@ -184,6 +187,7 @@ function [result] = isKingChessed(team, Board)
     result = 0;
 end
 
+% find king efficiently
 function [x, y] = searchKing(team, Board)
     if(team == 1)
         if(Board(5, 1) == team * 1)

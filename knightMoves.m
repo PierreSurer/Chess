@@ -1,3 +1,4 @@
+% lists all possible moves for a knight
 function moves = knightMoves(pos, Board)
     moves = zeros(8, 1, 'int8'); % initialized to the max number of moves
     idx = 0;

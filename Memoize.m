@@ -1,3 +1,4 @@
+% dictionnary to store position and assignate a value
 classdef Memoize  
     properties (Constant)
         Data = MemoizeStore
@@ -8,6 +9,7 @@ classdef Memoize
             % disp(length(obj.Data.Data));
         end
 
+        % returns all required values
         function [startPos, endPos, val, depth, flag] = lookup(obj, cell)
             d = obj.Data.Data(keyHash(cell));
             startPos = d(1);

@@ -1,3 +1,4 @@
+% lists all possible moves for a king
 function moves = kingMoves(pos, Board)
     moves = zeros(8, 1, 'int8'); % initialized to the max number of moves
     idx = 0;

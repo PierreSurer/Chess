@@ -5,12 +5,12 @@ displayBoard(Board, 1);
 previousMoves = cell(0);
 
 team = 1; % team: 1=white, -1=black
-humanPlayers = [true, true]; % white, black players are either AI or human player
-depth = 2; % AI search depth (number of moves)
+humanPlayers = [true, false]; % white, black players are either AI or human player
+depth = 5; % AI search depth (number of moves)
 rng('shuffle'); % seed for the rng: comment for non-predictible outputs
 
 while(true)
-    if team == 1 && humanPlayers(1) || team == -1 && humanPlayers(2)
+    if team == 1 && humanPlayers(1) || team == -1 && humanPlayers(2) % choose the display side
         fprintf('Team %s played by human - ', teamName(team));
         [startPos, endPos] = playUserMove(team, Board);
         fprintf('%s\n', algebraic.stringify(startPos, endPos, team, Board));
@@ -40,17 +40,17 @@ while(true)
 end
 
 function [startPos, endPos] = playAIMove(depth, previousMoves, team, Board)
-    persistent lastTimeElapsed;
-    persistent newDepth;
+    persistent lastTimeElapsed; % stores timings across functions call
+    persistent newDepth; % stores depth across calls
     % reset memoization of board values
     memo = Memoize;
     memo.reset;
-    %debugAI(depth, team, Board);
+    
     if size(previousMoves, 1) < 8
         tStart = tic;
         [success, startPos, endPos] = computeOpening(Board, previousMoves);
         tEnd = toc(tStart);
-        if ~success
+        if ~success % Opening in dataset
             fprintf('depth %d - ', depth);
             tStart = tic;
             [startPos, endPos] = computeAI(depth, team, -1E8, +1E8, Board);
@@ -66,8 +66,8 @@ function [startPos, endPos] = playAIMove(depth, previousMoves, team, Board)
         end
     else
         if(size(lastTimeElapsed, 1) >= 3)
-            val = sum(lastTimeElapsed(end-2:end));
-            if val < 18.0 
+            val = sum(lastTimeElapsed(end-2:end)); % sum of last 3 moves
+            if val < 20.0
                 newDepth = newDepth + 1;
             elseif val > 250.0 
                 newDepth = newDepth - 1;
@@ -90,40 +90,6 @@ function [startPos, endPos] = playAIMove(depth, previousMoves, team, Board)
         disp([startPos, endPos]);
         throw("unexpected error");
     end
-end
-
-% function to show what moves the AI sees after minmax tree exploration.
-function [] = debugAI(depth, team, Board)
-    fprintf("Debug AI vision:\n");
-    askAlt = true;
-    for d = depth:-1:1
-        before = evaluate(team, Board);
-        [startPos, endPos, after] = computeAI(d, team, -1E7, +1E7, Board);
-        str = algebraic.stringify(startPos, endPos, team, Board);
-        fprintf("AI %s wants to play %s, before=%f, after=%f\n", teamName(team), str, before, after);
-        if askAlt
-            str = input("prompt> ", "s");
-            if str == 'n'
-                fprintf("continuing\n");
-            elseif str == 'a'
-                disp(Board);
-                while true
-                    str = input("play alternative: ", "s");
-                    try
-                        [startPos, endPos] = algebraic.parse(str, team, Board);
-                        break;
-                    catch
-                        fprintf("failed to parse algebraic\n");
-                    end
-                end
-            else
-                askAlt = false;
-            end
-        end
-        Board = playMove(startPos, endPos, Board);
-        team = -team;
-    end
-    fprintf("----\n");
 end
 
 function [startPos, endPos] = playUserMove(team, Board)
@@ -229,7 +195,7 @@ end
 
 function [] = displayBoard(Board, side)
     Board = Board.';
-    if(side == 1)
+    if(side == 1) % flip display side
         Board = flip(Board, 1);
     else
         Board = flip(Board, 2);
@@ -246,6 +212,8 @@ function [] = displayBoard(Board, side)
     checker = repmat(tile, 4);
     checker = imresize(checker, s(1) / 8, 'nearest');
     imshow(checker);
+
+    % coordinates display
     txt = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     colors = [240 217 181; 181 136 99] / 255;
     for i = 1:8

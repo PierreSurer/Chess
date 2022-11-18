@@ -1,3 +1,4 @@
+% evaluate a position for a team
 function val = evaluate(team, Board)
     eval = HeatMap;
     pieces = find(Board ~= 0);
